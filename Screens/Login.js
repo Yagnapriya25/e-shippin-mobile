@@ -1,28 +1,29 @@
-import React from "react";
-import { Button, SafeAreaView, Text, TextInput, View } from "react-native";
+import React, { useState } from "react";
+import { Button, SafeAreaView, Text, TextInput, View, TouchableOpacity } from "react-native";
 import { StyleSheet } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
 import {
-    useFonts,
-    CrimsonPro_200ExtraLight,
-    CrimsonPro_300Light,
-    CrimsonPro_400Regular,
-    CrimsonPro_500Medium,
-    CrimsonPro_600SemiBold,
-    CrimsonPro_700Bold,
-    CrimsonPro_800ExtraBold,
-    CrimsonPro_900Black,
-    CrimsonPro_200ExtraLight_Italic,
-    CrimsonPro_300Light_Italic,
-    CrimsonPro_400Regular_Italic,
-    CrimsonPro_500Medium_Italic,
-    CrimsonPro_600SemiBold_Italic,
-    CrimsonPro_700Bold_Italic,
-    CrimsonPro_800ExtraBold_Italic,
-    CrimsonPro_900Black_Italic,
-  } from '@expo-google-fonts/crimson-pro';
+  useFonts,
+  CrimsonPro_200ExtraLight,
+  CrimsonPro_300Light,
+  CrimsonPro_400Regular,
+  CrimsonPro_500Medium,
+  CrimsonPro_600SemiBold,
+  CrimsonPro_700Bold,
+  CrimsonPro_800ExtraBold,
+  CrimsonPro_900Black,
+  CrimsonPro_200ExtraLight_Italic,
+  CrimsonPro_300Light_Italic,
+  CrimsonPro_400Regular_Italic,
+  CrimsonPro_500Medium_Italic,
+  CrimsonPro_600SemiBold_Italic,
+  CrimsonPro_700Bold_Italic,
+  CrimsonPro_800ExtraBold_Italic,
+  CrimsonPro_900Black_Italic,
+} from '@expo-google-fonts/crimson-pro';
 
 export default function Login() {
-  // Load the Crimson Pro font
+  // Load the Crimson Pro font (always called at the top)
   let [fontsLoaded] = useFonts({
     CrimsonPro_200ExtraLight,
     CrimsonPro_300Light,
@@ -42,7 +43,15 @@ export default function Login() {
     CrimsonPro_900Black_Italic,
   });
 
-  // Show loading state until fonts are loaded
+  // State to manage password visibility
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Function to toggle password visibility
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  // If fonts are not loaded, show loading state
   if (!fontsLoaded) {
     return <Text>Loading...</Text>;
   }
@@ -51,13 +60,30 @@ export default function Login() {
     <SafeAreaView style={styles.container}>
       <View style={styles.formbox}>
         <Text style={styles.formHead}>E-shippin</Text>
-        <TextInput placeholder="Email" style={styles.input} />
-        <TextInput placeholder="Password" secureTextEntry style={styles.input} />
-        <TextInput style={styles.input} />
+        <TextInput placeholder="Email" style={styles.email} />
+        
+        {/* Password Input with Toggle Visibility */}
+        <View style={styles.passwordContainer}>
+          <TextInput
+            placeholder="Password"
+            secureTextEntry={!showPassword}
+            style={styles.input}
+          />
+          <TouchableOpacity onPress={togglePasswordVisibility} style={styles.iconContainer}>
+            <Ionicons 
+              name={showPassword ? "eye-off-outline" : "eye-outline"} // Toggle icon based on state
+              size={24}
+              color="#000"
+            />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.button}>
         <Button onPress={() => {}} title="Login" />
         <Text style={styles.footerText}>Forget Password?</Text>
-        <Text style={styles.footerText}>Don't Have An Account? SignUp</Text>
-      </View>
+        <View style={styles.footerContainer}><Text style={styles.footerText1}>Don't Have An Account?</Text><Text style={styles.footerText2}>SignUp</Text>
+        </View>
+        </View>
+         </View>
     </SafeAreaView>
   );
 }
@@ -78,7 +104,7 @@ const styles = StyleSheet.create({
   },
   formHead: {
     textAlign: "center",
-    paddingTop: 15,
+    paddingTop: 25,
     paddingBottom: 50,
     fontSize: 30,
     fontFamily: "CrimsonPro_800ExtraBold", // Apply Crimson Pro Bold font
@@ -89,11 +115,43 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 10,
     paddingLeft: 10,
+    marginTop:12,
     borderRadius: 5,
+    flex: 1,
+  },
+  email:{
+    height:40,
+    borderRadius:5,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingLeft: 10,
   },
   footerText: {
     textAlign: "center",
-    marginTop: 10,
+    marginTop: 20,
     color: "#007BFF",  // Blue color for links
   },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  iconContainer: {
+    position: "absolute",
+    right: 15,
+  },
+  button:{
+    paddingTop:30
+    
+  },
+  footerContainer:{
+    display:"flex",
+    flexDirection:"row",
+    justifyContent:"center",
+    paddingTop:10,
+  },
+  footerText2:{
+    color:"#007BFF"
+  }
 });
