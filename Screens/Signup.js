@@ -1,12 +1,12 @@
-import React, { useState } from "react";
 import {
-  Button,
-  SafeAreaView,
-  Text,
-  TextInput,
   View,
+  Text,
+  SafeAreaView,
+  TextInput,
   TouchableOpacity,
+  Button,
 } from "react-native";
+import { useState } from "react";
 import { StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -29,8 +29,7 @@ import {
   CrimsonPro_900Black_Italic,
 } from "@expo-google-fonts/crimson-pro";
 
-export default function Login() {
-  // Load the Crimson Pro font (always called at the top)
+export default function Signup() {
   let [fontsLoaded] = useFonts({
     CrimsonPro_200ExtraLight,
     CrimsonPro_300Light,
@@ -67,6 +66,7 @@ export default function Login() {
     <SafeAreaView style={styles.container}>
       <View style={styles.formbox}>
         <Text style={styles.formHead}>E-shippin</Text>
+        <TextInput placeholder="Username" style={styles.username} />
         <TextInput placeholder="Email" style={styles.email} />
 
         {/* Password Input with Toggle Visibility */}
@@ -88,11 +88,10 @@ export default function Login() {
           </TouchableOpacity>
         </View>
         <View style={styles.button}>
-          <Button onPress={() => {}} title="Login" />
-          <Text style={styles.footerText}>Forget Password?</Text>
+          <Button onPress={() => {}} title="Signup" />
           <View style={styles.footerContainer}>
-            <Text style={styles.footerText1}>Don't Have An Account?</Text>
-            <Text style={styles.footerText2}>SignUp</Text>
+            <Text style={styles.footerText1}>Already Have An Account?</Text>
+            <Text style={styles.footerText2}>Login</Text>
           </View>
         </View>
       </View>
@@ -108,7 +107,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   formbox: {
-    height: 400,
+    height: 450,
     backgroundColor: "#fff",
     width: 300,
     borderRadius: 15,
@@ -139,10 +138,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingLeft: 10,
   },
-  footerText: {
-    textAlign: "center",
-    marginTop: 20,
-    color: "#007BFF", // Blue color for links
+  username: {
+    height: 40,
+    borderRadius: 5,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    marginBottom: 22,
+    paddingLeft: 10,
   },
   passwordContainer: {
     flexDirection: "row",
@@ -154,13 +156,13 @@ const styles = StyleSheet.create({
     right: 15,
   },
   button: {
-    paddingTop: 30,
+    paddingTop: 20,
   },
   footerContainer: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
-    paddingTop: 10,
+    paddingTop: 20,
   },
   footerText2: {
     color: "#007BFF",

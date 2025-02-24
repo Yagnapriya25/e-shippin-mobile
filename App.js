@@ -8,12 +8,14 @@ import { StyleSheet, View } from "react-native";
 // import Cart from "./Screens/Cart";
 // import Profile from "./Screens/Profile";
 import Login from "./Screens/Login";
+import Signup from "./Screens/Signup";
 
 const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
-    <Login/>
+    // <Login/>
+    <Signup/>
     
     // <NavigationContainer>
     //   <Tab.Navigator screenOptions={{tabBarShowLabel:false,tabBarActiveTintColor:"purple"}}>
