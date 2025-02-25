@@ -87,14 +87,14 @@ export default function Login() {
             />
           </TouchableOpacity>
         </View>
-        <View style={styles.button}>
-          <Button onPress={() => {}} title="Login" />
-          <Text style={styles.footerText}>Forget Password?</Text>
+        <TouchableOpacity style={styles.button} onPress={() => console.log('Button Pressed')}>
+                <Text style={styles.buttonText}>Login</Text>
+              </TouchableOpacity>
+        <Text style={styles.footerText}>Forget Password?</Text>
           <View style={styles.footerContainer}>
             <Text style={styles.footerText1}>Don't Have An Account?</Text>
             <Text style={styles.footerText2}>SignUp</Text>
           </View>
-        </View>
       </View>
     </SafeAreaView>
   );
@@ -153,9 +153,19 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 15,
   },
-  button: {
-    paddingTop: 30,
+ button: {
+    paddingTop: 11,
+    height:40,
+    marginTop:20,
+    borderRadius:20,
+    backgroundColor:"#8EF3AC"
   },
+   buttonText:{
+     textAlign:"center",
+     fontSize:15,
+     fontFamily:"CrimsonPro_800ExtraBold",
+     fontWeight:"500"
+   },
   footerContainer: {
     display: "flex",
     flexDirection: "row",

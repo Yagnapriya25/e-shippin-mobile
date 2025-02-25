@@ -5,9 +5,9 @@ import {
   Text,
   TextInput,
   View,
+  TouchableOpacity
 } from "react-native";
 import { StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import {
   useFonts,
   CrimsonPro_200ExtraLight,
@@ -61,11 +61,11 @@ export default function ForgetPassword(){
         <View style={styles.formbox}>
           <Text style={styles.formHead}>E-shippin</Text>
           <TextInput placeholder="Email" style={styles.email} />
-          <View style={styles.button}>
-            <Button onPress={() => {}} title="Reset" />
-            <Text style={styles.footerText}>Login</Text>
-            <Text style={styles.success}>Email sent successfully</Text>
-          </View>
+             <TouchableOpacity style={styles.button} onPress={() => console.log('Button Pressed')}>
+                                 <Text style={styles.buttonText}>Reset</Text>
+                               </TouchableOpacity>
+          <Text style={styles.footerText}>Login</Text>
+          <Text style={styles.success}>Email sent successfully</Text>
         </View>
       </SafeAreaView>
     )
@@ -107,8 +107,18 @@ const styles = StyleSheet.create({
     color: "#007BFF", // Blue color for links
   },
   button: {
-    paddingTop: 20,
+    paddingTop: 11,
+    height:40,
+    marginTop:20,
+    borderRadius:20,
+    backgroundColor:"#8EF3AC"
   },
+   buttonText:{
+     textAlign:"center",
+     fontSize:15,
+     fontFamily:"CrimsonPro_800ExtraBold",
+     fontWeight:"500"
+   },
  success:{
     textAlign:"center",
     color:"green"

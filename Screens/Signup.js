@@ -87,13 +87,13 @@ export default function Signup() {
             />
           </TouchableOpacity>
         </View>
-        <View style={styles.button}>
-          <Button onPress={() => {}} title="Signup" />
-          <View style={styles.footerContainer}>
+         <TouchableOpacity style={styles.button} onPress={() => console.log('Button Pressed')}>
+                       <Text style={styles.buttonText}>Signup</Text>
+                     </TouchableOpacity>
+        <View style={styles.footerContainer}>
             <Text style={styles.footerText1}>Already Have An Account?</Text>
             <Text style={styles.footerText2}>Login</Text>
           </View>
-        </View>
       </View>
     </SafeAreaView>
   );
@@ -156,8 +156,18 @@ const styles = StyleSheet.create({
     right: 15,
   },
   button: {
-    paddingTop: 20,
+    paddingTop: 11,
+    height:40,
+    marginTop:20,
+    borderRadius:20,
+    backgroundColor:"#8EF3AC"
   },
+   buttonText:{
+     textAlign:"center",
+     fontSize:15,
+     fontFamily:"CrimsonPro_800ExtraBold",
+     fontWeight:"500"
+   },
   footerContainer: {
     display: "flex",
     flexDirection: "row",
