@@ -9,14 +9,17 @@ import { StyleSheet, View } from "react-native";
 // import Profile from "./Screens/Profile";
 import Login from "./Screens/Login";
 import Signup from "./Screens/Signup";
+import ForgetPassword from "./Screens/ForgetPassword";
+import ResetPassword from "./Screens/ResetPassword";
 
 const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
     // <Login/>
-    <Signup/>
-    
+    // <Signup/>
+    // <ForgetPassword/>
+    <ResetPassword/>
     // <NavigationContainer>
     //   <Tab.Navigator screenOptions={{tabBarShowLabel:false,tabBarActiveTintColor:"purple"}}>
     //     <Tab.Screen
