@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View,Text } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import Home from "./Screens/Home";
 import Category from "./Screens/Category";
@@ -21,14 +21,25 @@ export default function App() {
     // <ForgetPassword/>
     // <ResetPassword/>
     <NavigationContainer>
-      <Tab.Navigator screenOptions={{tabBarShowLabel:false,tabBarActiveTintColor:"purple"}}>
+      <Tab.Navigator screenOptions={{tabBarShowLabel:false,tabBarActiveTintColor:"blue",}}>
         <Tab.Screen
           name="Home"
           component={Home}
           options={{
+            headerShown:false,
+            title:"E-shippin",
             tabBarLabel: "Home",
+            headerStyle:{
+              backgroundColor:"purple",
+            },
+            headerTintColor:"white",
+            headerLeft:()=>(
+              <View>
+              
+              </View>
+            ),
+
             tabBarIcon: () => <Ionicons name="home-outline" size={23} />,
-      
           }}
         />
         <Tab.Screen
