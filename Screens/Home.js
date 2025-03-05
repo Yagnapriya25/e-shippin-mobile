@@ -14,39 +14,44 @@ import { Ionicons } from "@expo/vector-icons";
 import { data } from "../assets/Data/offers";
 
 export default function Home() {
-  // Set up state for storing data
-  const [offer,setOffer]=useState(data);
+  const [offer, setOffer] = useState(data);
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true); // For handling loading state
-  const [error, setError] = useState(null); // For handling errors
+  const [product, setProduct] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch data from the API when the component mounts
   useEffect(() => {
-    // Fetch categories data from API
     const fetchData = async () => {
       try {
-        const categoriesResponse = await fetch(`https://e-shipin-server.onrender.com/api/category/getall`); // Replace with your API URL
-        
+        const categoriesResponse = await fetch(
+          `https://e-shipin-server.onrender.com/api/category/getall`
+        );
         if (!categoriesResponse.ok) {
           throw new Error("Failed to fetch data from API");
         }
-
         const responseData = await categoriesResponse.json();
-
-        // Extract categories from the response
         const categoriesData = responseData.categories;
-        setCategories(categoriesData); // Set categories data
+        setCategories(categoriesData);
       } catch (err) {
-        setError(err.message); // Handle any errors
+        setError(err.message);
       } finally {
-        setLoading(false); // Stop loading after fetching is done
+        setLoading(false);
       }
     };
-
     fetchData();
-  }, []); // Empty dependency array means this will run once on mount
+  }, []);
 
-  // If loading, show loading text
+  useEffect(() => {
+    const fetchProduct = async () => {
+      const productFetch = await fetch(
+        `https://e-shipin-server.onrender.com/api/product/getall`
+      );
+      const data = await productFetch.json();
+      setProduct(data.products);
+    };
+    fetchProduct();
+  }, []);
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -55,7 +60,6 @@ export default function Home() {
     );
   }
 
-  // If there was an error, show error message
   if (error) {
     return (
       <SafeAreaView style={styles.container}>
@@ -74,10 +78,9 @@ export default function Home() {
         <TextInput placeholder="Search" style={styles.searchInput} />
         <Ionicons name="search" size={20} style={styles.searchIcon} />
       </View>
-      <ScrollView>
+      <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
         <View style={styles.categoryContainer}>
           <Text style={styles.categoryHeader}>Category</Text>
-          {/* Use FlatList to render categories */}
           <FlatList
             data={categories}
             keyExtractor={(item) => item._id}
@@ -92,14 +95,35 @@ export default function Home() {
         </View>
         <View style={styles.offerContainer}>
           <Text style={styles.offerHeader}>Trending offers</Text>
-          {/* Use FlatList to render categories */}
           <FlatList
             data={offer}
             keyExtractor={(item) => item.id}
             horizontal
             renderItem={({ item }) => (
               <View style={styles.offerItemContainer}>
-                <Image source={item.image} style={styles.offerImage} resizeMode="contain"/>
+                <Image
+                  source={item.image}
+                  style={styles.offerImage}
+                  resizeMode="contain"
+                />
+              </View>
+            )}
+          />
+        </View>
+        <View style={styles.productContainer}>
+          <Text style={styles.productHeader}>Explore now</Text>
+          <FlatList
+            data={product}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <View style={styles.productItemContainer}>
+                <Image
+                  source={{
+                    uri: item.images && item.images.length > 0 ? item.images[0].image : 'https://path/to/default/image.png'
+                  }}
+                  style={styles.productImage}
+                />
+                <Text style={styles.productName}>{item.name}</Text>
               </View>
             )}
           />
@@ -119,12 +143,10 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     paddingHorizontal: 30,
-
   },
   logo: {
     height: 30,
     width: 30,
-    
   },
   logotext: {
     padding: 5,
@@ -137,7 +159,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingTop: 10,
     paddingHorizontal: 30,
-
   },
   searchInput: {
     width: 280,
@@ -152,8 +173,6 @@ const styles = StyleSheet.create({
   categoryContainer: {
     paddingTop: 20,
     paddingHorizontal: 20,
-
-   
   },
   categoryHeader: {
     fontSize: 16,
@@ -164,7 +183,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     margin: 10,
     borderRadius: 10,
-    
   },
   categoryImage: {
     width: 60,
@@ -177,23 +195,46 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textAlign: "center",
   },
-  offerContainer:{
+  offerContainer: {
     paddingTop: 20,
     paddingHorizontal: 20,
   },
-  offerHeader:{
+  offerHeader: {
     fontSize: 16,
     fontWeight: "bold",
+    paddingBottom: 10,
   },
-  offerItemContainer:{
+  offerItemContainer: {
     flex: 1,
     alignItems: "center",
     margin: 5,
     borderRadius: 10,
-    height:150
+    height: 150,
   },
-  offerImage:{
+  offerImage: {
     borderRadius: 10,
     marginBottom: 10,
-  }
+  },
+  productContainer: {
+    paddingTop: 20,
+    paddingHorizontal: 20,
+  },
+  productHeader: {
+    fontSize: 16,
+    fontWeight: "bold",
+    paddingBottom: 10,
+  },
+  productItemContainer: {
+    marginBottom: 20,
+  },
+  productImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+  },
+  productName: {
+    fontSize: 14,
+    textAlign: "center",
+    marginTop: 10,
+  },
 });
