@@ -11,9 +11,11 @@ import {
 import { StyleSheet } from "react-native";
 import img from "../assets/Images/logo.png";
 import { Ionicons } from "@expo/vector-icons";
+import { data } from "../assets/Data/offers";
 
 export default function Home() {
   // Set up state for storing data
+  const [offer,setOffer]=useState(data);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true); // For handling loading state
   const [error, setError] = useState(null); // For handling errors
@@ -84,6 +86,20 @@ export default function Home() {
               <View style={styles.categoryItemContainer}>
                 <Image source={{ uri: item.photo }} style={styles.categoryImage} />
                 <Text style={styles.categoryName}>{item.name}</Text>
+              </View>
+            )}
+          />
+        </View>
+        <View style={styles.offerContainer}>
+          <Text style={styles.offerHeader}>Trending offers</Text>
+          {/* Use FlatList to render categories */}
+          <FlatList
+            data={offer}
+            keyExtractor={(item) => item.id}
+            horizontal
+            renderItem={({ item }) => (
+              <View style={styles.offerItemContainer}>
+                <Image source={item.image} style={styles.offerImage} resizeMode="contain"/>
               </View>
             )}
           />
@@ -161,4 +177,23 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textAlign: "center",
   },
+  offerContainer:{
+    paddingTop: 20,
+    paddingHorizontal: 20,
+  },
+  offerHeader:{
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  offerItemContainer:{
+    flex: 1,
+    alignItems: "center",
+    margin: 5,
+    borderRadius: 10,
+    height:150
+  },
+  offerImage:{
+    borderRadius: 10,
+    marginBottom: 10,
+  }
 });
