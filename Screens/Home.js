@@ -7,8 +7,8 @@ import {
   TextInput,
   FlatList,
   ScrollView,
+  StyleSheet,
 } from "react-native";
-import { StyleSheet } from "react-native";
 import img from "../assets/Images/logo.png";
 import { Ionicons } from "@expo/vector-icons";
 import { data } from "../assets/Data/offers";
@@ -110,13 +110,13 @@ export default function Home() {
             )}
           />
         </View>
+
+        {/* Instead of FlatList for products, use View for wrapping */}
         <View style={styles.productContainer}>
           <Text style={styles.productHeader}>Explore now</Text>
-          <FlatList
-            data={product}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item }) => (
-              <View style={styles.productItemContainer}>
+          <View style={styles.productGrid}>
+            {product.map((item) => (
+              <View key={item._id} style={styles.productItemContainer}>
                 <Image
                   source={{
                     uri: item.images && item.images.length > 0 ? item.images[0].image : 'https://path/to/default/image.png'
@@ -124,9 +124,11 @@ export default function Home() {
                   style={styles.productImage}
                 />
                 <Text style={styles.productName}>{item.name}</Text>
+                <Text style={styles.productPrice}>₹{item.price}</Text>
+                
               </View>
-            )}
-          />
+            ))}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -224,17 +226,31 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     paddingBottom: 10,
   },
+  productGrid: {
+    flexDirection: 'row',  // Items in a row
+    flexWrap: 'wrap',      // Allow wrapping to the next line
+    justifyContent: 'space-between',  // Add space between items
+  },
   productItemContainer: {
-    marginBottom: 20,
+    width: '32%',          // 2 items per row
+    marginBottom: 10,      // Add space between items
+    alignItems: 'center',
+    backgroundColor:"#fff",
+    padding:10,
+    borderRadius:8,
   },
   productImage: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
+    backgroundColor:"#F5F5DC",
     borderRadius: 10,
   },
   productName: {
-    fontSize: 14,
+    fontSize: 12,
     textAlign: "center",
     marginTop: 10,
   },
+  productPrice:{
+    fontWeight:600
+  }
 });
