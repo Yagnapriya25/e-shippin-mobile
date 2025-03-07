@@ -33,12 +33,6 @@ export default function App() {
               backgroundColor:"purple",
             },
             headerTintColor:"white",
-            headerLeft:()=>(
-              <View>
-              
-              </View>
-            ),
-
             tabBarIcon: () => <Ionicons name="home-outline" size={23} />,
           }}
         />
@@ -46,6 +40,7 @@ export default function App() {
           name="Category"
           component={Category}
           options={{
+            headerShown:false,
             tabBarLabel: "Category",
             tabBarIcon: () => <Ionicons name="grid-outline" size={23} />,
           }}
