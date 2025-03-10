@@ -24,7 +24,8 @@ export default function App() {
       <Tab.Navigator screenOptions={{tabBarShowLabel:false,tabBarActiveTintColor:"blue",tabBarStyle:{
         backgroundColor:"#FFFFF0"
       },headerStyle:{
-        backgroundColor:"#FFFFF0"
+        backgroundColor:"#FFFFF0",
+        height:90
       }}}>
         <Tab.Screen
           name="Home"
