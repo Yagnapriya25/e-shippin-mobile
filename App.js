@@ -21,7 +21,11 @@ export default function App() {
     // <ForgetPassword/>
     // <ResetPassword/>
     <NavigationContainer>
-      <Tab.Navigator screenOptions={{tabBarShowLabel:false,tabBarActiveTintColor:"blue",}}>
+      <Tab.Navigator screenOptions={{tabBarShowLabel:false,tabBarActiveTintColor:"blue",tabBarStyle:{
+        backgroundColor:"#FFFFF0"
+      },headerStyle:{
+        backgroundColor:"#FFFFF0"
+      }}}>
         <Tab.Screen
           name="Home"
           component={Home}
@@ -51,6 +55,8 @@ export default function App() {
           options={{
             tabBarLabel: "Add",
             tabBarIcon: () => <Ionicons name="add-circle-outline" size={28} />,
+            title:"Choose Your Category",
+          
           }}
         />
         <Tab.Screen
