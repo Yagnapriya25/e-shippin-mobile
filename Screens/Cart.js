@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import img from '../assets/Images/offer2.jpeg'
+import img from '../assets/Images/logo.png'
 
 export default function Cart() {
 
@@ -40,10 +40,12 @@ export default function Cart() {
   },[])
 
   const formatPrice = (price) => {
+    const roundedPrice = Math.round(price)
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-    }).format(price);
+      maximumFractionDigits: 0,
+    }).format(roundedPrice);
   };
 
    if(loading){
@@ -56,6 +58,10 @@ export default function Cart() {
 
   return (
     <SafeAreaView style={styles.container}>
+    <View style={styles.header}>
+        <Image source={img} style={styles.logo} />
+        <Text style={styles.logotext}>E-shippin</Text>
+      </View>
       <ScrollView style={styles.cartContainer}>
         <View style={styles.cartHeader}>
           <Text style={styles.cartCount}>Cart : {cartCount}</Text>
@@ -96,6 +102,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#B9D9EB",
   },
+  header: {
+    display: "flex",
+    flexDirection: "row",
+    paddingHorizontal: 30,
+    paddingTop:50
+  },
+  logo: {
+    height: 30,
+    width: 30,
+  },
+  logotext: {
+    padding: 5,
+    fontSize: 16,
+    paddingLeft: 10,
+    fontWeight: "600",
+  },
   cartContainer: {
     padding: 15,
   },
@@ -131,13 +153,13 @@ const styles = StyleSheet.create({
   },
   cartProductName:{
     fontSize:15,
-    fontWeight:500
+    fontWeight:400
 
   },
   cartProductPrice:{
      fontSize:16,
      paddingTop:10,
-     fontWeight:600
+     fontWeight:500
   },
   cartPayment: {
     backgroundColor: "#D0F0C0",
@@ -151,7 +173,7 @@ const styles = StyleSheet.create({
   cartPaymentText: {
     paddingTop: 10,
     color: "#000",
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 500,
   },
   cartPaymentBtn: {

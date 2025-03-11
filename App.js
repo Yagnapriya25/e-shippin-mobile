@@ -65,6 +65,7 @@ export default function App() {
           component={Cart}
           options={{
             tabBarLabel: "Cart",
+            headerShown:false,
             tabBarIcon: () => <Ionicons name="cart-outline" size={25} />,
           }}
         />
@@ -73,6 +74,7 @@ export default function App() {
           component={Profile}
           options={{
             tabBarLabel: "Profile",
+            headerShown:false,
             tabBarIcon: () => <Ionicons name="person-outline" size={22} />,
           }}
         />

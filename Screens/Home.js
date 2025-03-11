@@ -87,7 +87,7 @@ export default function Home() {
             horizontal
             renderItem={({ item }) => (
               <View style={styles.categoryItemContainer}>
-                <Image source={{ uri: item.photo }} style={styles.categoryImage} />
+                <Image source={{ uri: item.photo }} style={styles.categoryImage} resizeMode="contain"/>
                 <Text style={styles.categoryName}>{item.name}</Text>
               </View>
             )}
