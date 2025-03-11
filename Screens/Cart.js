@@ -4,15 +4,18 @@ import {
   ScrollView,
   StyleSheet,
   SafeAreaView,
-  Button,
+ Image
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
+import img from '../assets/Images/offer2.jpeg'
 
 export default function Cart() {
 
   const [cart,setCart]=useState([]);
   const [loading,setLoading]=useState(true);
+  const [cartCount,setcartCount]=useState();
+  const [cartTotalPrice,setCartTotalPrice]=useState();
   
 
   useEffect(()=>{
@@ -22,36 +25,58 @@ export default function Cart() {
           method:"GET"
         })
         const data = await res.json();
-        if(data && Array.isArray(data.items)){
-          setCart(data.items)
+        console.log(data.totalPrice.totalPrice);
+        if(data && Array.isArray(data.cart.items)){
+          setCart(data.cart.items)
+          setcartCount(data.cart.items.length)
+          setCartTotalPrice(data.totalPrice.totalPrice)
           setLoading(false)
         }
       } catch (error) {
-        // setLoading(true)
+        setLoading(true)
       }
     }
     fetchCartData();
   },[])
 
-  //  if(loading){
-  //   return(
-  //     <View>
-  //     <Text>Loading...</Text>
-  //     </View>
-  //   )
-  //  }
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+    }).format(price);
+  };
+
+   if(loading){
+    return(
+      <View>
+      <Text>Loading...</Text>
+      </View>
+    )
+   }
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.cartContainer}>
         <View style={styles.cartHeader}>
-          <Text style={styles.cartCount}>Cart : </Text>
+          <Text style={styles.cartCount}>Cart : {cartCount}</Text>
           <Ionicons name="trash" size={20} style={styles.cartEmpty} />
         </View>
         {
           cart.map((item)=>(
             <View style={styles.cartItemContainer} key={item._id}>
-            <Text>{item.product.name}</Text>
+            <Image
+            source={{
+              uri: item.product.images && item.product.images.length > 0
+                ? item.product.images[0].image
+                : img
+            }}
+            resizeMode="contain"
+            style={styles.cartItemImages}
+          />
+          <View style={styles.cartItemNameSite}>
+          <Text style={styles.cartProductName}>{item.product.name}</Text>
+          <Text style={styles.cartProductPrice}>{formatPrice(item.product.price)}</Text>
+          </View>
           </View>
           ))
         }
@@ -60,7 +85,7 @@ export default function Cart() {
         
       </ScrollView>
       <View style={styles.cartPayment}>
-        <Text style={styles.cartPaymentText}>Total Price : </Text>
+        <Text style={styles.cartPaymentText}>Total Price :{formatPrice(cartTotalPrice)} </Text>
         <Text style={styles.cartPaymentBtn}>Buy Now </Text>
       </View>
     </SafeAreaView>
@@ -91,10 +116,28 @@ const styles = StyleSheet.create({
     height: 90,
     width: "100%",
     display: "flex",
-    justifyContent: "center",
-    padding: 20,
+    flexDirection:"row",
+    padding: 10,
     borderRadius: 10,
     marginBottom:10,
+  },
+  cartItemImages:{
+     height:70,
+     width:140
+  },
+  cartItemNameSite:{
+    paddingHorizontal:30,
+    paddingVertical:10
+  },
+  cartProductName:{
+    fontSize:15,
+    fontWeight:500
+
+  },
+  cartProductPrice:{
+     fontSize:16,
+     paddingTop:10,
+     fontWeight:600
   },
   cartPayment: {
     backgroundColor: "#D0F0C0",
@@ -118,5 +161,6 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     borderRadius: 20,
     fontWeight: 800,
+    color:"#fff"
   },
 });
