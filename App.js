@@ -12,7 +12,7 @@ import Signup from "./Screens/Signup";
 import ForgetPassword from "./Screens/ForgetPassword";
 import ResetPassword from "./Screens/ResetPassword";
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator()
 
 export default function App() {
   return (
