@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { act } from "react";
 
 
 const initialState = {
@@ -23,7 +22,7 @@ const userSlice = createSlice({
         state.userInfo = action.payload;
 
       },
-      loadingFail(state,action){
+      loginFail(state,action){
         state.loading=false;
         state.error=action.payload
       },
@@ -121,3 +120,37 @@ const userSlice = createSlice({
       }
     }
 }) 
+
+
+export {
+   loginRequest,
+   loginSuccess,
+   loginFail,
+   signupRequest,
+   signupSuccess,
+   signupFail,
+   otpRequest,
+   otpSuccess,
+   otpFail,
+   forgetPasswordRequest,
+   forgetPasswordSuccess,
+   forgetPasswordFail,
+   resetRequest,
+   resetSuccess,
+   resetFail,
+   forgetPasswordRequest,
+   forgetPasswordSuccess,
+   forgetPasswordFail,
+   editUserRequest,
+   editUserSuccess,
+   editUserFail,
+   deleteUserRequest,
+   deleteUserSuccess,
+   deleteUserFail,
+   getAllUserRequest,
+   getAllUserSuccess,
+   getAllUserFail,
+   getUserRequest,
+   getUserSuccess,
+   getUserFail
+}
