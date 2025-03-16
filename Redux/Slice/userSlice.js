@@ -154,3 +154,5 @@ export {
    getUserSuccess,
    getUserFail
 }
+
+export default userSlice.reducer;
