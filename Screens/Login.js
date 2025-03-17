@@ -105,7 +105,7 @@ export default function Login() {
 
         <View style={styles.footerContainer}>
           <Text style={styles.footerText1}>Don't Have An Account?</Text>
-          <Text style={styles.footerText2} onPress={() => navigation.navigate("Signup")}>
+          <Text style={styles.footerText2} onPress={() => navigation.navigate("signup")}>
             SignUp
           </Text>
         </View>
