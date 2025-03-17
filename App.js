@@ -1,7 +1,11 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, StyleSheet, View,Text } from "react-native";
+import 'react-native-gesture-handler';
+import { createStackNavigator } from "@react-navigation/stack";
+import { StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
+import React, { useState, useEffect } from 'react';
+import { AsyncStorage } from "react-native"; // Ensure you're importing AsyncStorage correctly
 import Home from "./Screens/Home";
 import Category from "./Screens/Category";
 import AddPost from "./Screens/AddPost";
@@ -11,80 +15,135 @@ import Login from "./Screens/Login";
 import Signup from "./Screens/Signup";
 import ForgetPassword from "./Screens/ForgetPassword";
 import ResetPassword from "./Screens/ResetPassword";
+// import ProductPage from "./Screens/ProductPage"; // Insight/Product Page
+import { Button } from 'react-native';
+import { Provider } from "react-redux";
+import Store from './Redux/Store/Store'
 
-const Tab = createBottomTabNavigator()
+const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
-export default function App() {
+// Tab Navigator
+function TabNavigator() {
   return (
-    // <Login/>
-    // <Signup/>
-    // <ForgetPassword/>
-    // <ResetPassword/>
+    <Tab.Navigator
+      screenOptions={{
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: "blue",
+        tabBarStyle: {
+          backgroundColor: "#FFFFF0"
+        },
+        headerStyle: {
+          backgroundColor: "#FFFFF0",
+          height: 90
+        }
+      }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          headerShown: false,
+          title: "E-shippin",
+          tabBarLabel: "Home",
+          headerStyle: {
+            backgroundColor: "purple",
+          },
+          headerTintColor: "white",
+          tabBarIcon: () => <Ionicons name="home-outline" size={23} />,
+        }}
+      />
+      <Tab.Screen
+        name="Category"
+        component={Category}
+        options={{
+          headerShown: false,
+          tabBarLabel: "Category",
+          tabBarIcon: () => <Ionicons name="grid-outline" size={23} />,
+        }}
+      />
+      <Tab.Screen
+        name="AddPost"
+        component={AddPost}
+        options={{
+          tabBarLabel: "Add",
+          tabBarIcon: () => <Ionicons name="add-circle-outline" size={28} />,
+          title: "Choose Your Category",
+        }}
+      />
+      <Tab.Screen
+        name="Cart"
+        component={Cart}
+        options={{
+          tabBarLabel: "Cart",
+          headerShown: false,
+          tabBarIcon: () => <Ionicons name="cart-outline" size={25} />,
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          tabBarLabel: "Profile",
+          headerShown: false,
+          tabBarIcon: () => <Ionicons name="person-outline" size={22} />,
+        }}
+      />
+    </Tab.Navigator>
+  );
+}
+
+// Stack Navigator
+function StackNavigator() {
+  return (
+    <Stack.Navigator options={{headerShown:"false"}}>
+      <Stack.Screen name="login" component={Login} />
+      <Stack.Screen name="signup" component={Signup} />
+      <Stack.Screen name="forget" component={ForgetPassword} />
+      <Stack.Screen name="reset" component={ResetPassword} />
+    </Stack.Navigator>
+  );
+}
+
+// App Component
+export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
+
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      const id = await AsyncStorage.getItem("id");
+      const token = await AsyncStorage.getItem("token");
+
+      if (id && token) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuthStatus();
+  }, []);
+
+  if (isAuthenticated === null) {
+    return (
+      <Provider store={Store}>
+      <NavigationContainer>
+      <StackNavigator/>
+      </NavigationContainer>
+      </Provider>
+     
+    ); // Wait until the auth status is determined
+  }
+
+  return (
     <NavigationContainer>
-      <Tab.Navigator screenOptions={{tabBarShowLabel:false,tabBarActiveTintColor:"blue",tabBarStyle:{
-        backgroundColor:"#FFFFF0"
-      },headerStyle:{
-        backgroundColor:"#FFFFF0",
-        height:90
-      }}}>
-        <Tab.Screen
-          name="Home"
-          component={Home}
-          options={{
-            headerShown:false,
-            title:"E-shippin",
-            tabBarLabel: "Home",
-            headerStyle:{
-              backgroundColor:"purple",
-            },
-            headerTintColor:"white",
-            tabBarIcon: () => <Ionicons name="home-outline" size={23} />,
-          }}
-        />
-        <Tab.Screen
-          name="Category"
-          component={Category}
-          options={{
-            headerShown:false,
-            tabBarLabel: "Category",
-            tabBarIcon: () => <Ionicons name="grid-outline" size={23} />,
-          }}
-        />
-        <Tab.Screen
-          name="AddPost"
-          component={AddPost}
-          options={{
-            tabBarLabel: "Add",
-            tabBarIcon: () => <Ionicons name="add-circle-outline" size={28} />,
-            title:"Choose Your Category",
-          
-          }}
-        />
-        <Tab.Screen
-          name="Cart"
-          component={Cart}
-          options={{
-            tabBarLabel: "Cart",
-            headerShown:false,
-            tabBarIcon: () => <Ionicons name="cart-outline" size={25} />,
-          }}
-        />
-        <Tab.Screen
-          name="Profile"
-          component={Profile}
-          options={{
-            tabBarLabel: "Profile",
-            headerShown:false,
-            tabBarIcon: () => <Ionicons name="person-outline" size={22} />,
-          }}
-        />
-      </Tab.Navigator>
+    <TabNavigator/>
     </NavigationContainer>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    
- },
+    // Add any custom styles here if needed
+  },
 });
