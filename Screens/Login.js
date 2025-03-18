@@ -85,8 +85,6 @@ export default function Login() {
             placeholder="Password"
             secureTextEntry={!showPassword}
             style={styles.input}
-            value={credentials.password}
-            onChangeText={(text) => setCredentials({ ...credentials, password: text })}
           />
           <TouchableOpacity onPress={togglePasswordVisibility} style={styles.iconContainer}>
             <Ionicons
@@ -101,7 +99,7 @@ export default function Login() {
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
 
-        <Text style={styles.footerText}>Forget Password?</Text>
+        <Text style={styles.footerText} onPress={()=>navigation.navigate("forget")}>Forget Password?</Text>
 
         <View style={styles.footerContainer}>
           <Text style={styles.footerText1}>Don't Have An Account?</Text>
@@ -143,6 +141,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginTop: 12,
     borderRadius: 5,
+    width:280
   },
   email: {
     height: 40,

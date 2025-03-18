@@ -27,6 +27,7 @@ import {
   CrimsonPro_800ExtraBold_Italic,
   CrimsonPro_900Black_Italic,
 } from "@expo-google-fonts/crimson-pro";
+import { useNavigation } from "@react-navigation/native";
 export default function ForgetPassword(){
      let [fontsLoaded] = useFonts({
         CrimsonPro_200ExtraLight,
@@ -48,7 +49,7 @@ export default function ForgetPassword(){
       });
     
   
-    
+    const navigation = useNavigation();
      
     
       // If fonts are not loaded, show loading state
@@ -64,7 +65,7 @@ export default function ForgetPassword(){
              <TouchableOpacity style={styles.button} onPress={() => console.log('Button Pressed')}>
                                  <Text style={styles.buttonText}>Reset</Text>
                                </TouchableOpacity>
-          <Text style={styles.footerText}>Login</Text>
+          <Text style={styles.footerText} onPress={()=>navigation.navigate("login")}>Login</Text>
           <Text style={styles.success}>Email sent successfully</Text>
         </View>
       </SafeAreaView>

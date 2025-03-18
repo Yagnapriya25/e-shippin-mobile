@@ -96,8 +96,8 @@ function TabNavigator() {
 // Stack Navigator
 function StackNavigator() {
   return (
-    <Stack.Navigator options={{headerShown:"false"}}>
-      <Stack.Screen name="login" component={Login} />
+    <Stack.Navigator screenOptions={{headerShown:false}}>
+      <Stack.Screen name="login" component={Login}/>
       <Stack.Screen name="signup" component={Signup} />
       <Stack.Screen name="forget" component={ForgetPassword} />
       <Stack.Screen name="reset" component={ResetPassword} />

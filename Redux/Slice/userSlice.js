@@ -6,6 +6,7 @@ const initialState = {
     error: null,
     otpSent: false,
     passwordResetSuccess: false,
+    isAuthenticated:false
 };
 
 const userSlice = createSlice({
@@ -19,6 +20,7 @@ const userSlice = createSlice({
         loginSuccess(state, action) {
             state.loading = false;
             state.userInfo = action.payload;
+            state.isAuthenticated = true;
         },
         loginFail(state, action) {
             state.loading = false;
@@ -32,6 +34,7 @@ const userSlice = createSlice({
         signupSuccess(state, action) {
             state.loading = false;
             state.userInfo = action.payload;
+            state.isAuthenticated = true;
         },
         signupFail(state, action) {
             state.loading = false;

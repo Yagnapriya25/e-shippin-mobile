@@ -28,8 +28,10 @@ import {
   CrimsonPro_800ExtraBold_Italic,
   CrimsonPro_900Black_Italic,
 } from "@expo-google-fonts/crimson-pro";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Signup() {
+  const navigation = useNavigation();
   let [fontsLoaded] = useFonts({
     CrimsonPro_200ExtraLight,
     CrimsonPro_300Light,
@@ -92,7 +94,7 @@ export default function Signup() {
                      </TouchableOpacity>
         <View style={styles.footerContainer}>
             <Text style={styles.footerText1}>Already Have An Account?</Text>
-            <Text style={styles.footerText2}>Login</Text>
+            <Text style={styles.footerText2} onPress={()=>navigation.navigate("login")}>Login</Text>
           </View>
       </View>
     </SafeAreaView>
