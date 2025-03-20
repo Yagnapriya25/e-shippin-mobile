@@ -29,9 +29,13 @@ import {
   CrimsonPro_900Black_Italic,
 } from "@expo-google-fonts/crimson-pro";
 import { useNavigation } from "@react-navigation/native";
+import { signupRequest, signupSuccess } from "../Redux/Slice/userSlice";
+import { useDispatch } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Signup() {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   let [fontsLoaded] = useFonts({
     CrimsonPro_200ExtraLight,
     CrimsonPro_300Light,
@@ -51,17 +55,41 @@ export default function Signup() {
     CrimsonPro_900Black_Italic,
   });
 
-  // State to manage password visibility
   const [showPassword, setShowPassword] = useState(false);
-
-  // Function to toggle password visibility
+  const [credentials,setCredentials]=useState({
+    username:"",
+    email:"",
+    password:""
+  })
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  // If fonts are not loaded, show loading state
   if (!fontsLoaded) {
     return <Text>Loading...</Text>;
+  }
+
+  const handleSignup = async(e)=>{
+      e.preventDefault();
+      try {
+        dispatch(signupRequest());
+        const res = await dispatch(signupSuccess(credentials));
+        if(res && res.user){
+           AsyncStorage.setItem("id",res.user._id);
+           AsyncStorage.setItem("userToken",res.token);
+           const id = await AsyncStorage.getItem("id");
+           const token = await AsyncStorage.getItem("userToken");
+           if(token&&id){
+            moveTo("Home")
+           }
+           else{
+             moveTo("login")
+           }
+         }
+        }
+      } catch (error) {
+        
+      }
   }
 
   return (

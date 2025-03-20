@@ -16,7 +16,6 @@ import Signup from "./Screens/Signup";
 import ForgetPassword from "./Screens/ForgetPassword";
 import ResetPassword from "./Screens/ResetPassword";
 // import ProductPage from "./Screens/ProductPage"; // Insight/Product Page
-import { Button } from 'react-native';
 import { Provider } from "react-redux";
 import Store from './Redux/Store/Store'
 
@@ -94,11 +93,7 @@ function TabNavigator() {
   );
 }
 
-
-
 export default function App() {
-
-
   return (
     <Provider store={Store}>
      <NavigationContainer>
