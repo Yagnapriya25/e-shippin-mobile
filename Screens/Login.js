@@ -19,14 +19,14 @@ import { loginRequest } from "../Redux/Slice/userSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
 import { useNavigation } from "@react-navigation/native";
 
-export default function Login() {
-  // Load the Crimson Pro font (always called at the top)
+export default function Login({navigation}) {
   let [fontsLoaded] = useFonts({
     CrimsonPro_800ExtraBold,
   });
 
-  const navigation = useNavigation(); 
-
+const moveTo = (screen,payload)=>{
+  navigation.navigate(screen,{...payload})
+}
 
   const [showPassword, setShowPassword] = useState(false);
   const [credentials, setCredentials] = useState({
@@ -57,11 +57,16 @@ export default function Login() {
       const result = await dispatch(login(credentials));
 
       if (result && result.user && result.token) {
-        // Store token in AsyncStorage
-        await AsyncStorage.setItem('userToken', result.token);
-
-        // Navigate to the home screen
-        navigation.navigate("Home");
+         await AsyncStorage.setItem('userToken', result.token);
+         await AsyncStorage.setItem('id',result.user._id);
+         const id = await AsyncStorage.getItem("id");
+         const token = await AsyncStorage.getItem("userToken");
+        if(token&&id){
+         moveTo("Home")
+        }
+        else{
+          moveTo("login")
+        }
       }
     } catch (err) {
       console.error("Login failed:", err);
@@ -85,6 +90,8 @@ export default function Login() {
             placeholder="Password"
             secureTextEntry={!showPassword}
             style={styles.input}
+            value={credentials.password}
+            onChangeText={(text) => setCredentials({ ...credentials, password: text })}
           />
           <TouchableOpacity onPress={togglePasswordVisibility} style={styles.iconContainer}>
             <Ionicons

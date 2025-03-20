@@ -23,10 +23,11 @@ import Store from './Redux/Store/Store'
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-// Tab Navigator
+
 function TabNavigator() {
   return (
     <Tab.Navigator
+    initialRouteName="Home"
       screenOptions={{
         tabBarShowLabel: false,
         tabBarActiveTintColor: "blue",
@@ -93,57 +94,28 @@ function TabNavigator() {
   );
 }
 
-// Stack Navigator
-function StackNavigator() {
-  return (
-    <Stack.Navigator screenOptions={{headerShown:false}}>
-      <Stack.Screen name="login" component={Login}/>
-      <Stack.Screen name="signup" component={Signup} />
-      <Stack.Screen name="forget" component={ForgetPassword} />
-      <Stack.Screen name="reset" component={ResetPassword} />
-    </Stack.Navigator>
-  );
-}
 
-// App Component
+
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
 
-  useEffect(() => {
-    const checkAuthStatus = async () => {
-      const id = await AsyncStorage.getItem("id");
-      const token = await AsyncStorage.getItem("token");
-
-      if (id && token) {
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-      }
-    };
-
-    checkAuthStatus();
-  }, []);
-
-  if (isAuthenticated === null) {
-    return (
-      <Provider store={Store}>
-      <NavigationContainer>
-      <StackNavigator/>
-      </NavigationContainer>
-      </Provider>
-     
-    ); // Wait until the auth status is determined
-  }
 
   return (
-    <NavigationContainer>
-    <TabNavigator/>
-    </NavigationContainer>
+    <Provider store={Store}>
+     <NavigationContainer>
+     <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName="login">
+     <Stack.Screen name="login" component={Login}/>
+     <Stack.Screen name="signup" component={Signup} />
+     <Stack.Screen name="forget" component={ForgetPassword} />
+     <Stack.Screen name="reset" component={ResetPassword} />
+     <Stack.Screen name="Home" component={TabNavigator}/>
+   </Stack.Navigator>
+     </NavigationContainer>
+    </Provider>
+   
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    // Add any custom styles here if needed
   },
 });
