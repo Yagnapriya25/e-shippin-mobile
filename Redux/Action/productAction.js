@@ -20,7 +20,7 @@ import {
     searchProductFail,
     searchProductRequest,
     searchProductSuccess
-} from "../slices/productSlice";
+} from "../Slice/productSlice";
 
 const productPost = (credential, categoryInfo, userInfo) => async (dispatch) => {
     try {
@@ -51,7 +51,7 @@ const productPost = (credential, categoryInfo, userInfo) => async (dispatch) => 
 const getAllProduct = () => async (dispatch) => {
     try {
         dispatch(productGetAllRequest());
-        const res = await fetch(`${process.env.REACT_APP_URL}/product/getall`, {
+        const res = await fetch(`https://e-shipin-server.onrender.com/api/product/getall`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"

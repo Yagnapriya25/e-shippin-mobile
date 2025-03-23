@@ -8,54 +8,53 @@ import {
   FlatList,
   ScrollView,
   StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import img from "../assets/Images/logo.png";
 import { Ionicons } from "@expo/vector-icons";
 import { data } from "../assets/Data/offers";
+import { useDispatch, useSelector } from "react-redux";
+import { categoryGetAll } from "../Redux/Action/categoryAction";
+import { getAllProduct } from "../Redux/Action/productAction";
 
-export default function Home() {
+export default function Home({navigation}) {
+  const dispatch = useDispatch();
   const [offer, setOffer] = useState(data);
-  const [categories, setCategories] = useState([]);
-  const [product, setProduct] = useState([]);
+  // const [product, setProduct] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
+
+
+  const { categoryInfo, error, loading: categoryLoading } = useSelector((state) => state.category || {});
+  const categories = categoryInfo?.categories || [];
+
+  const {productInfo}  = useSelector((state) => state.product);
+  const product = productInfo?.products || [];
+   
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const categoriesResponse = await fetch(
-          `https://e-shipin-server.onrender.com/api/category/getall`
-        );
-        if (!categoriesResponse.ok) {
-          throw new Error("Failed to fetch data from API");
-        }
-        const responseData = await categoriesResponse.json();
-        const categoriesData = responseData.categories;
-        setCategories(categoriesData);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+      await dispatch(categoryGetAll()).finally(()=>{
+        setLoading(false)
+      });
     };
     fetchData();
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const productFetch = await fetch(
-        `https://e-shipin-server.onrender.com/api/product/getall`
-      );
-      const data = await productFetch.json();
-      setProduct(data.products);
+      setLoading(true);
+      await dispatch(getAllProduct());
+      setLoading(false);
+      console.log('productInfo:', productInfo);
     };
     fetchProduct();
-  }, []);
+  }, [dispatch]);
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Text>Loading...</Text>
+      <SafeAreaView style={styles.loadingcontainer}>
+        <ActivityIndicator size={"large"}/>
       </SafeAreaView>
     );
   }
@@ -86,10 +85,13 @@ export default function Home() {
             keyExtractor={(item) => item._id}
             horizontal
             renderItem={({ item }) => (
-              <View style={styles.categoryItemContainer}>
-                <Image source={{ uri: item.photo }} style={styles.categoryImage} resizeMode="contain"/>
-                <Text style={styles.categoryName}>{item.name}</Text>
-              </View>
+              <TouchableOpacity 
+              style={styles.categoryItemContainer} 
+              onPress={() => console.log("Pressed")}
+            >
+              <Image source={{ uri: item.photo }} style={styles.categoryImage} resizeMode="contain"/>
+              <Text style={styles.categoryName}>{item.name}</Text>
+            </TouchableOpacity>
             )}
           />
         </View>
@@ -136,6 +138,13 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
+  loadingcontainer:{
+    display:"flex",
+    justifyContent:"center",
+    alignItems:"center",
+    flex:1,
+    backgroundColor:"#B9D9EB"
+  },
   container: {
     flex: 1,
     paddingTop: 40,

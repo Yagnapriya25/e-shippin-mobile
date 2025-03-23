@@ -1,4 +1,4 @@
-import { categoryDeleteFail, categoryDeleteRequest, categoryDeleteSuccess, categoryGetAllFail, categoryGetAllRequest, categoryGetAllSuccess, categoryGetSingleFail, categoryGetSingleRequest, categoryGetSingleSuccess, categoryPostFail, categoryPostRequest, categoryPostSuccess, categoryProductFail, categoryProductRequest, categoryProductSuccess } from "../slices/categorySlice";
+import { categoryDeleteFail, categoryDeleteRequest, categoryDeleteSuccess, categoryGetAllFail, categoryGetAllRequest, categoryGetAllSuccess, categoryGetSingleFail, categoryGetSingleRequest, categoryGetSingleSuccess, categoryPostFail, categoryPostRequest, categoryPostSuccess, categoryProductFail, categoryProductRequest, categoryProductSuccess } from "../Slice/categorySlice";
 
 
 
@@ -35,14 +35,14 @@ try {
 const categoryGetAll = ()=>async(dispatch)=>{
     try {
         dispatch(categoryGetAllRequest());
-        const res = await fetch(`${process.env.REACT_APP_URL}/category/getall`,{
+        const res = await fetch(`https://e-shipin-server.onrender.com/api/category/getall`,{
             method:"GET",
             headers:{
                 "Content-Type":"application/json"
             }
         })
         const data = await res.json();
-        console.log(data);
+        // console.log(data);
         if(res.ok){
             dispatch(categoryGetAllSuccess(data));
         }

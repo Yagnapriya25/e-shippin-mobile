@@ -14,7 +14,6 @@ import Profile from "./Screens/Profile";
 import Login from "./Screens/Login";
 import Signup from "./Screens/Signup";
 import ForgetPassword from "./Screens/ForgetPassword";
-import ResetPassword from "./Screens/ResetPassword";
 // import ProductPage from "./Screens/ProductPage"; // Insight/Product Page
 import { Provider } from "react-redux";
 import Store from './Redux/Store/Store'
@@ -101,7 +100,6 @@ export default function App() {
      <Stack.Screen name="login" component={Login}/>
      <Stack.Screen name="signup" component={Signup} />
      <Stack.Screen name="forget" component={ForgetPassword} />
-     <Stack.Screen name="reset" component={ResetPassword} />
      <Stack.Screen name="Home" component={TabNavigator}/>
    </Stack.Navigator>
      </NavigationContainer>
