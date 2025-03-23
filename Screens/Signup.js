@@ -17,7 +17,6 @@ import { signup, verifyOtp } from "../Redux/Action/userAction";
 export default function Signup({ navigation }) {
   const dispatch = useDispatch();
   const [otpSent, setOtpSent] = useState(false); // Flag to check if OTP is sent
-  const { error, userInfo } = useSelector((state) => state.user);
   const [credentials, setCredentials] = useState({
     username: "",
     email: "",
