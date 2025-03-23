@@ -26,7 +26,7 @@ const Stack = createStackNavigator();
 function TabNavigator() {
   return (
     <Tab.Navigator
-    initialRouteName="Home"
+    initialRouteName="AppHome"
       screenOptions={{
         tabBarShowLabel: false,
         tabBarActiveTintColor: "blue",
@@ -40,7 +40,7 @@ function TabNavigator() {
       }}
     >
       <Tab.Screen
-        name="Home"
+        name="AppHome"
         component={Home}
         options={{
           headerShown: false,

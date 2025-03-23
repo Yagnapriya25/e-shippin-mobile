@@ -1,129 +1,164 @@
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   SafeAreaView,
   TextInput,
   TouchableOpacity,
-  Button,
+  Alert,
 } from "react-native";
-import { useState } from "react";
 import { StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  useFonts,
-  CrimsonPro_200ExtraLight,
-  CrimsonPro_300Light,
-  CrimsonPro_400Regular,
-  CrimsonPro_500Medium,
-  CrimsonPro_600SemiBold,
-  CrimsonPro_700Bold,
-  CrimsonPro_800ExtraBold,
-  CrimsonPro_900Black,
-  CrimsonPro_200ExtraLight_Italic,
-  CrimsonPro_300Light_Italic,
-  CrimsonPro_400Regular_Italic,
-  CrimsonPro_500Medium_Italic,
-  CrimsonPro_600SemiBold_Italic,
-  CrimsonPro_700Bold_Italic,
-  CrimsonPro_800ExtraBold_Italic,
-  CrimsonPro_900Black_Italic,
-} from "@expo-google-fonts/crimson-pro";
 import { useNavigation } from "@react-navigation/native";
-import { signupRequest, signupSuccess } from "../Redux/Slice/userSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { signup, verifyOtp } from "../Redux/Action/userAction";
 
-export default function Signup() {
-  const navigation = useNavigation();
+export default function Signup({ navigation }) {
   const dispatch = useDispatch();
-  let [fontsLoaded] = useFonts({
-    CrimsonPro_200ExtraLight,
-    CrimsonPro_300Light,
-    CrimsonPro_400Regular,
-    CrimsonPro_500Medium,
-    CrimsonPro_600SemiBold,
-    CrimsonPro_700Bold,
-    CrimsonPro_800ExtraBold,
-    CrimsonPro_900Black,
-    CrimsonPro_200ExtraLight_Italic,
-    CrimsonPro_300Light_Italic,
-    CrimsonPro_400Regular_Italic,
-    CrimsonPro_500Medium_Italic,
-    CrimsonPro_600SemiBold_Italic,
-    CrimsonPro_700Bold_Italic,
-    CrimsonPro_800ExtraBold_Italic,
-    CrimsonPro_900Black_Italic,
+  const [otpSent, setOtpSent] = useState(false); // Flag to check if OTP is sent
+  const { error, userInfo } = useSelector((state) => state.user);
+  const [credentials, setCredentials] = useState({
+    username: "",
+    email: "",
+    password: "",
   });
-
+  const [otp, setOtp] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [credentials,setCredentials]=useState({
-    username:"",
-    email:"",
-    password:""
-  })
+  const [loading, setLoading] = useState(false);
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  if (!fontsLoaded) {
-    return <Text>Loading...</Text>;
-  }
+  const handleChange = (e, field) => {
+    setCredentials({
+      ...credentials,
+      [field]: e,
+    });
+  };
 
-  const handleSignup = async(e)=>{
-      e.preventDefault();
-      try {
-        dispatch(signupRequest());
-        const res = await dispatch(signupSuccess(credentials));
-        if(res && res.user){
-           AsyncStorage.setItem("id",res.user._id);
-           AsyncStorage.setItem("userToken",res.token);
-           const id = await AsyncStorage.getItem("id");
-           const token = await AsyncStorage.getItem("userToken");
-           if(token&&id){
-            moveTo("Home")
-           }
-           else{
-             moveTo("login")
-           }
-         }
-        }
-      } catch (error) {
-        
-      }
-  }
+  const handleSignup = (e) => {
+    e.preventDefault();
+    if (loading) return; // Prevent multiple submissions when loading
+    setLoading(true); // Set loading state to true when the signup starts
+    dispatch(signup(credentials)).finally(() => {
+      setLoading(false); // Set loading back to false after the dispatch
+      setOtpSent(true); // OTP sent, now change the UI
+    });
+  };
+
+  const handleOtpSubmit = (e) => {
+    e.preventDefault();
+    if (loading) return;
+    setLoading(true);
+    dispatch(verifyOtp({ otp, email: credentials.email }))
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((err) => {
+        console.error("OTP verification failed", err);
+      })
+      .finally(() => {
+        setLoading(false);
+        setTimeout(() => {
+          navigation.navigate("login");
+        }, 1000);
+      });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.formbox}>
         <Text style={styles.formHead}>E-shippin</Text>
-        <TextInput placeholder="Username" style={styles.username} />
-        <TextInput placeholder="Email" style={styles.email} />
 
-        {/* Password Input with Toggle Visibility */}
-        <View style={styles.passwordContainer}>
-          <TextInput
-            placeholder="Password"
-            secureTextEntry={!showPassword}
-            style={styles.input}
-          />
-          <TouchableOpacity
-            onPress={togglePasswordVisibility}
-            style={styles.iconContainer}
-          >
-            <Ionicons
-              name={showPassword ? "eye-off-outline" : "eye-outline"} // Toggle icon based on state
-              size={24}
-              color="#000"
+        {/* Before OTP is sent, show Username, Email, and Password */}
+        {!otpSent && (
+          <>
+            <TextInput
+              placeholder="Username"
+              style={styles.input}
+              value={credentials.username}
+              onChangeText={(text) => handleChange(text, "username")}
             />
-          </TouchableOpacity>
-        </View>
-         <TouchableOpacity style={styles.button} onPress={() => console.log('Button Pressed')}>
-                       <Text style={styles.buttonText}>Signup</Text>
-                     </TouchableOpacity>
+            <TextInput
+              placeholder="Email"
+              style={styles.input}
+              value={credentials.email}
+              onChangeText={(text) => handleChange(text, "email")}
+              keyboardType="email-address"
+            />
+            <View style={styles.passwordContainer}>
+              <TextInput
+                placeholder="Password"
+                secureTextEntry={!showPassword}
+                style={styles.input}
+                value={credentials.password}
+                onChangeText={(text) => handleChange(text, "password")}
+              />
+              <TouchableOpacity
+                onPress={togglePasswordVisibility}
+                style={styles.iconContainer}
+              >
+                <Ionicons
+                  name={showPassword ? "eye-off-outline" : "eye-outline"}
+                  size={24}
+                  color="#000"
+                />
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleSignup}
+              disabled={loading}
+            >
+              <Text style={styles.buttonText}>
+                {loading ? "Sending OTP..." : "Signup"}
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {/* After OTP is sent, only show Email and OTP */}
+        {otpSent && (
+          <>
+            <TextInput
+              placeholder="Email"
+              style={styles.input}
+              value={credentials.email}
+              onChangeText={(text) => handleChange(text, "email")}
+              keyboardType="email-address"
+              editable={false} // Email field should be read-only after OTP is sent
+            />
+            <TextInput
+              placeholder="Enter OTP"
+              style={styles.input}
+              keyboardType="numeric"
+              value={otp}
+              onChangeText={(text) => setOtp(text)}
+              required
+            />
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleOtpSubmit}
+              disabled={loading}
+            >
+              <Text style={styles.buttonText}>
+                {loading ? "Verifying OTP..." : "Verify OTP"}
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
+
         <View style={styles.footerContainer}>
-            <Text style={styles.footerText1}>Already Have An Account?</Text>
-            <Text style={styles.footerText2} onPress={()=>navigation.navigate("login")}>Login</Text>
-          </View>
+          <Text style={styles.footerText1}>Already Have An Account?</Text>
+          <Text
+            style={styles.footerText2}
+            onPress={() => navigation.navigate("login")}
+          >
+            Login
+          </Text>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -148,10 +183,10 @@ const styles = StyleSheet.create({
     paddingTop: 25,
     paddingBottom: 50,
     fontSize: 30,
-    fontFamily: "CrimsonPro_800ExtraBold", // Apply Crimson Pro Bold font
+    fontFamily: "CrimsonPro_800ExtraBold",
   },
   input: {
-    height: 40,
+    height: 50,
     borderColor: "#ccc",
     borderWidth: 1,
     marginBottom: 10,
@@ -159,22 +194,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
     borderRadius: 5,
     flex: 1,
-  },
-  email: {
-    height: 40,
-    borderRadius: 5,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingLeft: 10,
-  },
-  username: {
-    height: 40,
-    borderRadius: 5,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    marginBottom: 22,
-    paddingLeft: 10,
   },
   passwordContainer: {
     flexDirection: "row",
@@ -187,17 +206,17 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingTop: 11,
-    height:40,
-    marginTop:20,
-    borderRadius:20,
-    backgroundColor:"#8EF3AC"
+    height: 40,
+    marginTop: 20,
+    borderRadius: 20,
+    backgroundColor: "#8EF3AC",
   },
-   buttonText:{
-     textAlign:"center",
-     fontSize:15,
-     fontFamily:"CrimsonPro_800ExtraBold",
-     fontWeight:"500"
-   },
+  buttonText: {
+    textAlign: "center",
+    fontSize: 15,
+    fontFamily: "CrimsonPro_800ExtraBold",
+    fontWeight: "500",
+  },
   footerContainer: {
     display: "flex",
     flexDirection: "row",
@@ -206,5 +225,10 @@ const styles = StyleSheet.create({
   },
   footerText2: {
     color: "#007BFF",
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 10,
   },
 });

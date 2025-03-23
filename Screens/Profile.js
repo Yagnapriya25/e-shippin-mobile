@@ -12,7 +12,7 @@ export default function Profile() {
   useEffect(()=>{
     const fetchData = async()=>{
       try {
-        const res = await fetch(`https://e-shipin-server.onrender.com/api/user/getuser/671719b5b8de5c597b8e6b51`,{
+        const res = await fetch(`https://e-shipin-server.onrender.com/api/user/getuser/6713954b6844b323f1c31530`,{
           method:"GET"
          })
          const data = await res.json();

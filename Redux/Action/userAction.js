@@ -29,54 +29,54 @@ const login = (credentials)=>async(dispatch)=>{
 }
 
 
-const signup = (credentials)=>async(dispatch)=>{
+const signup = (credentials) => async (dispatch) => {
     try {
         dispatch(signupRequest());
-        const res = await fetch(`https://e-shipin-server.onrender.com/api/user/register`,{
-            method:"POST",
-            body:JSON.stringify(credentials),
-            headers:{
-                "Content-Type":"application/json"
-            }
-
-        })
+        const { email, password, username } = credentials;
+        const res = await fetch(`https://e-shipin-server.onrender.com/api/user/register`, {
+          method: "POST",
+          body: JSON.stringify(credentials),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
         const data = await res.json();
         console.log(data);
-        if(res.ok){
-            dispatch(signupSuccess(data))
+        if (res.ok) {
+          dispatch(signupSuccess(data));
+        } else {
+          dispatch(signupFail(data.message));
         }
-        else{
-            dispatch(signupFail(data.message))
-        }
-    } catch (error) {
-        dispatch(signupFail(error.message || "Network Error"))
-    }
-}
+      } catch (error) {
+        dispatch(signupFail(error.message));
+      }
+};
 
-const verifyOtp = (credentials)=>async(dispatch)=>{
+const verifyOtp = (credentials) => async (dispatch) => {
     try {
         dispatch(otpRequest());
-        const res = await fetch (`https://e-shipin-server.onrender.com/api/user/verify-otp`,{
-            method:"POST",
-            body:JSON.stringify(credentials),
-            headers:{
-                "Content-Type":"application/json"
-            }
-        })
+        const { otp } = credentials;
+        const res = await fetch(`https://e-shipin-server.onrender.com/api/user/verify-otp`, {
+          method: "POST",
+          body: JSON.stringify(credentials),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
         const data = await res.json();
         console.log(data);
-        if(res.ok){
-            dispatch(otpSuccess(data));
-            AsyncStorage.setItem("token",data.token);
-            AsyncStorage.setItem("id",data.user._id)
+        if (res.ok) {
+          dispatch(otpSuccess(data));
+          AsyncStorage.setItem("token",data.token);
+          AsyncStorage.setItem("id",data.user._id);
+          
+        } else {
+          dispatch(otpFail(data.message));
         }
-        else{
-            dispatch(otpFail.message)
-        }
-    } catch (error) {
-        dispatch(otpFail.error || "Network Error")
-    }
-}
+      } catch (error) {
+        dispatch(otpFail(error.message));
+      }
+};
 
 
 const forgetPassword = (credentials)=>async(dispatch)=>{
