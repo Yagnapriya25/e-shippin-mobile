@@ -4,7 +4,8 @@ import {
   ScrollView,
   StyleSheet,
   SafeAreaView,
- Image
+ Image,
+ ActivityIndicator
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
@@ -50,9 +51,9 @@ export default function Cart() {
 
    if(loading){
     return(
-      <View>
-      <Text>Loading...</Text>
-      </View>
+      <SafeAreaView style={styles.loadingcontainer}>
+      <ActivityIndicator size={"large"}/>
+      </SafeAreaView>
     )
    }
 
@@ -83,6 +84,14 @@ export default function Cart() {
           <Text style={styles.cartProductName}>{item.product.name}</Text>
           <Text style={styles.cartProductPrice}>{formatPrice(item.product.price)}</Text>
           </View>
+          <View style={styles.cartQuantity}>
+          <View style={{display:"flex",flexDirection:"row"}}>
+          <Text style={styles.operator}>+</Text>
+          <Text style={styles.operatorValue}>0</Text>
+          <Text style={styles.operator}>-</Text>
+          </View>
+          <Ionicons name="trash" size={16}/>
+          </View>
           </View>
           ))
         }
@@ -98,6 +107,13 @@ export default function Cart() {
   );
 }
 const styles = StyleSheet.create({
+  loadingcontainer:{
+        display:"flex",
+        justifyContent:"center",
+        alignItems:"center",
+        flex:1,
+        backgroundColor:"#B9D9EB"
+      },
   container: {
     flex: 1,
     backgroundColor: "#B9D9EB",
@@ -155,6 +171,10 @@ const styles = StyleSheet.create({
     fontSize:15,
     fontWeight:400
 
+  },
+  cartQuantity:{
+    paddingTop:10,
+    
   },
   cartProductPrice:{
      fontSize:16,

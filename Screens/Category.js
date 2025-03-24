@@ -1,41 +1,30 @@
-import { View, Text, SafeAreaView, StyleSheet, Image, TextInput, ScrollView } from 'react-native';
+import { View, Text, SafeAreaView, StyleSheet, Image, TextInput, ScrollView, ActivityIndicator } from 'react-native';
 import img from "../assets/Images/logo.png";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { categoryGetAll } from '../Redux/Action/categoryAction';
 
-export default function Category() {
-    const [categories, setCategories] = useState([]);
-    const [error, setError] = useState();
+export default function Category({navigation}) {
     const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch();
+    const { categoryInfo, error, loading: categoryLoading } = useSelector((state) => state.category || {});
+     const categories = categoryInfo?.categories || [];
+
 
     useEffect(() => {
         const fetchData = async () => {
-            try {
-                const res = await fetch(`https://e-shipin-server.onrender.com/api/category/getall`, {
-                    method: "GET"
-                });
-                const data = await res.json();
-                
-                // Check if data and categories are available
-                if (data && Array.isArray(data.categories)) {
-                    setLoading(false);
-                    setCategories(data.categories);  // Extract categories from the response
-                } else {
-                    setError("Error: Categories not found in the response");
-                    setLoading(false);
-                }
-            } catch (error) {
-                setError("Error occurred while getting data");
-                setLoading(false);
-            }
+          await dispatch (categoryGetAll()).finally(()=>{
+            setLoading(false)
+          })
         }
         fetchData();
-    }, []);
+    }, [dispatch]);
 
     if (loading) {
         return (
-            <SafeAreaView style={styles.container}>
-                <Text>Loading...</Text>
+        <SafeAreaView style={styles.loadingcontainer}>
+              <ActivityIndicator size={"large"}/>
             </SafeAreaView>
         );
     }
@@ -69,6 +58,13 @@ export default function Category() {
 }
 
 const styles = StyleSheet.create({
+    loadingcontainer:{
+        display:"flex",
+        justifyContent:"center",
+        alignItems:"center",
+        flex:1,
+        backgroundColor:"#B9D9EB"
+      },
     container: {
         flex: 1,
         paddingTop: 40,

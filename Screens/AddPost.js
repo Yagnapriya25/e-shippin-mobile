@@ -1,35 +1,34 @@
 import { useEffect, useState } from 'react';
-import {View,Text, SafeAreaView,ScrollView,Image} from 'react-native';
+import {View,Text, SafeAreaView,ScrollView,Image, ActivityIndicator} from 'react-native';
 import { StyleSheet } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from 'react-redux';
+import { categoryGetAll } from '../Redux/Action/categoryAction';
 
 
-export default function AddPost(){
-   
-    const [categories,setCategories]=useState([]);
+export default function AddPost({navigation}){
+   const dispatch = useDispatch();
+    // const [categories,setCategories]=useState([]);
     const [loading,setLoading]=useState(true);
+    const {categoryInfo,error,loading:categoryLoading}= useSelector((state)=>state.category || {});
+    const categories = categoryInfo?.categories || [];
 
     useEffect(()=>{
         const fetchCategories = async()=>{
-            try {
-                const res = await fetch(`https://e-shipin-server.onrender.com/api/category/getall`,{
-                    method:"GET"
-                   })
-                   const data = await res.json();
-                   
-                    if(data && Array.isArray(data.categories)){
-                        setCategories(data.categories)
-                        setLoading(false);
-                    }
-                   
-            } catch (error) {
-                setLoading(true);
-            }
-          
-           
+          await dispatch(categoryGetAll()).finally(()=>{
+            setLoading(false);
+          })           
         }
         fetchCategories()
-    },[])
+    },[dispatch])
+
+    if(loading){
+        return(
+            <SafeAreaView style={styles.loadingcontainer}>
+            <ActivityIndicator size={'large'}/>
+            </SafeAreaView>
+        )
+    }
 
 
     return (
@@ -57,6 +56,13 @@ export default function AddPost(){
 }
 
 const styles = StyleSheet.create({
+    loadingcontainer:{
+        display:"flex",
+        justifyContent:"center",
+        alignItems:"center",
+        flex:1,
+        backgroundColor:"#B9D9EB"
+      },
     container: {
         flex: 1,
         paddingTop: 5,
