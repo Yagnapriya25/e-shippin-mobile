@@ -15,17 +15,13 @@ import img from "../assets/Images/logo.png";
 import { Ionicons } from "@expo/vector-icons";
 import { data } from "../assets/Data/offers";
 import { useDispatch, useSelector } from "react-redux";
-import { categoryGetAll } from "../Redux/Action/categoryAction";
+import { categoryGetAll, categoryGetSingle } from "../Redux/Action/categoryAction";
 import { getAllProduct } from "../Redux/Action/productAction";
 
 export default function Home({navigation}) {
   const dispatch = useDispatch();
   const [offer, setOffer] = useState(data);
-  // const [product, setProduct] = useState([]);
   const [loading, setLoading] = useState(true);
-
-
-
   const { categoryInfo, error, loading: categoryLoading } = useSelector((state) => state.category || {});
   const categories = categoryInfo?.categories || [];
 
@@ -46,10 +42,14 @@ export default function Home({navigation}) {
       setLoading(true);
       await dispatch(getAllProduct());
       setLoading(false);
-      console.log('productInfo:', productInfo);
     };
     fetchProduct();
   }, [dispatch]);
+
+
+
+
+
 
   if (loading) {
     return (
@@ -87,7 +87,7 @@ export default function Home({navigation}) {
             renderItem={({ item }) => (
               <TouchableOpacity 
               style={styles.categoryItemContainer} 
-              onPress={() => console.log("Pressed")}
+              onPress={()=>navigation.navigate("category-product",{cat_id:item._id})}
             >
               <Image source={{ uri: item.photo }} style={styles.categoryImage} resizeMode="contain"/>
               <Text style={styles.categoryName}>{item.name}</Text>
@@ -113,7 +113,6 @@ export default function Home({navigation}) {
           />
         </View>
 
-        {/* Instead of FlatList for products, use View for wrapping */}
         <View style={styles.productContainer}>
           <Text style={styles.productHeader}>Explore now</Text>
           <View style={styles.productGrid}>

@@ -14,9 +14,9 @@ import Profile from "./Screens/Profile";
 import Login from "./Screens/Login";
 import Signup from "./Screens/Signup";
 import ForgetPassword from "./Screens/ForgetPassword";
-// import ProductPage from "./Screens/ProductPage"; // Insight/Product Page
 import { Provider } from "react-redux";
 import Store from './Redux/Store/Store'
+import CategoryProduct from "./Screens/CategoryProduct";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -88,6 +88,7 @@ function TabNavigator() {
           tabBarIcon: () => <Ionicons name="person-outline" size={22} />,
         }}
       />
+
     </Tab.Navigator>
   );
 }
@@ -101,6 +102,11 @@ export default function App() {
      <Stack.Screen name="signup" component={Signup} />
      <Stack.Screen name="forget" component={ForgetPassword} />
      <Stack.Screen name="Home" component={TabNavigator}/>
+     <Stack.Screen name="category-product" component={CategoryProduct} options={{
+      headerShown:true,
+      title:"Product"
+      
+     }}/>
    </Stack.Navigator>
      </NavigationContainer>
     </Provider>

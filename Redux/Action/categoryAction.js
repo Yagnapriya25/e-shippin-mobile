@@ -42,7 +42,6 @@ const categoryGetAll = ()=>async(dispatch)=>{
             }
         })
         const data = await res.json();
-        // console.log(data);
         if(res.ok){
             dispatch(categoryGetAllSuccess(data));
         }
@@ -103,7 +102,7 @@ const getCategoryProducts = (categoryInfo)=>async(dispatch)=>{
     try {
         const {cat_id}=categoryInfo;
         dispatch(categoryProductRequest());
-        const res = await fetch(`${process.env.REACT_APP_URL}/category/${cat_id}`,{
+        const res = await fetch(`https://e-shipin-server.onrender.com/api/category/${cat_id}`,{
             method:"GET",
             headers:{
                 "Content-Type":"application/json"
