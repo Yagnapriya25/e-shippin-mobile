@@ -11,11 +11,12 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
+import { useFocusEffect } from '@react-navigation/native';
 import img from "../assets/Images/logo.png";
 import { Ionicons } from "@expo/vector-icons";
 import { data } from "../assets/Data/offers";
 import { useDispatch, useSelector } from "react-redux";
-import { categoryGetAll, categoryGetSingle } from "../Redux/Action/categoryAction";
+import { categoryGetAll } from "../Redux/Action/categoryAction";
 import { getAllProduct } from "../Redux/Action/productAction";
 
 export default function Home({navigation}) {
@@ -28,14 +29,17 @@ export default function Home({navigation}) {
   const {productInfo}  = useSelector((state) => state.product);
   const product = productInfo?.products || [];
    
-  useEffect(() => {
-    const fetchData = async () => {
-      await dispatch(categoryGetAll()).finally(()=>{
-        setLoading(false)
-      });
-    };
-    fetchData();
-  }, [dispatch]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        await dispatch(categoryGetAll()).finally(()=>{
+          setLoading(false)
+        });
+      };
+      fetchData();
+    }, [dispatch])
+  );
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -102,22 +106,22 @@ export default function Home({navigation}) {
             keyExtractor={(item) => item.id}
             horizontal
             renderItem={({ item }) => (
-              <View style={styles.offerItemContainer}>
+              <TouchableOpacity style={styles.offerItemContainer} onPress={()=>navigation.navigate("category-product",{cat_id:item.id})}>
                 <Image
                   source={item.image}
                   style={styles.offerImage}
                   resizeMode="contain"
                 />
-              </View>
+              </TouchableOpacity>
             )}
           />
         </View>
 
         <View style={styles.productContainer}>
           <Text style={styles.productHeader}>Explore now</Text>
-          <View style={styles.productGrid}>
+          <View style={styles.productGrid} >
             {product.map((item) => (
-              <View key={item._id} style={styles.productItemContainer}>
+              <TouchableOpacity key={item._id} style={styles.productItemContainer} onPress={()=>navigation.navigate("product-detail",{p_id:item._id})}>
                 <Image
                   source={{
                     uri: item.images && item.images.length > 0 ? item.images[0].image : 'https://path/to/default/image.png'
@@ -127,7 +131,7 @@ export default function Home({navigation}) {
                 <Text style={styles.productName}>{item.name}</Text>
                 <Text style={styles.productPrice}>₹{item.price}</Text>
                 
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         </View>

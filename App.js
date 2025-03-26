@@ -16,6 +16,7 @@ import Signup from "./Screens/Signup";
 import ForgetPassword from "./Screens/ForgetPassword";
 import { Provider } from "react-redux";
 import Store from './Redux/Store/Store'
+import ProductDetail from "./Screens/ProductDetail";
 import CategoryProduct from "./Screens/CategoryProduct";
 
 const Tab = createBottomTabNavigator();
@@ -103,6 +104,11 @@ export default function App() {
      <Stack.Screen name="forget" component={ForgetPassword} />
      <Stack.Screen name="Home" component={TabNavigator}/>
      <Stack.Screen name="category-product" component={CategoryProduct} options={{
+      headerShown:true,
+      title:"Product"
+      
+     }}/>
+     <Stack.Screen name="product-detail" component={ProductDetail} options={{
       headerShown:true,
       title:"Product"
       

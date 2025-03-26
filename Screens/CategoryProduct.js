@@ -10,7 +10,6 @@ export default function CategoryProduct({navigation,route}){
     const {categoryInfo,error,loading:categoryLoading}=useSelector((state)=>state.category || {});
     const product = categoryInfo?.products || [];
     const {cat_id} = route.params;
-    
     useEffect(() => {
         const fetchCategories = async () => {
             setLoading(true);
