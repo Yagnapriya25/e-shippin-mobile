@@ -69,12 +69,12 @@ const getAllProduct = () => async (dispatch) => {
     }
 };
 
-const getSingleProduct = (productInfo) => async (dispatch) => {
+const getSingleProduct = (p_id) => async (dispatch) => {
+
     try {
         dispatch(productGetSingleRequest());
-        const { p_id } = productInfo;
 
-        const res = await fetch(`${process.env.REACT_APP_URL}/product/getsingle/${productInfo}`, {
+        const res = await fetch(`https://e-shipin-server.onrender.com/api/product/getsingle/${p_id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
@@ -82,12 +82,15 @@ const getSingleProduct = (productInfo) => async (dispatch) => {
         });
 
         const data = await res.json();
-        console.log(data);
         if (res.ok) {
-            dispatch(productGetSingleSuccess(data));
-        } else {
+            if (data.product && data.product.images) {
+              dispatch(productGetSingleSuccess(data));  // Assuming the data is in `product`
+            } else {
+              dispatch(productGetSingleFail("Product or images not found"));
+            }
+          } else {
             dispatch(productGetSingleFail(data.message || "Failed to fetch product"));
-        }
+          }
     } catch (error) {
         dispatch(productGetSingleFail(error.message));
     }
