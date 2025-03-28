@@ -44,6 +44,7 @@ export default function ProductDetail({ navigation, route }) {
     }
   }, [singleProduct]);
   
+console.log(singleProduct);
 
   const formatPrice = (amount) => {
     return new Intl.NumberFormat("en-IN", {
@@ -86,35 +87,34 @@ export default function ProductDetail({ navigation, route }) {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.imageContainer}>
-          <View style={styles.bigImage}>
-          <Image source={{uri:selectedImage}}   height={100}
-          width={200} alt="product"/>
+          <View style={styles.bigImageContainer}>
+          <Image source={{uri:selectedImage}}
+          alt="product" resizeMode="contain" style={styles.bigImage}/>
           </View>
-          <View style={styles.ImageList}>
+          <View style={styles.ImageListContainer}>
   {singleProduct?.product.images &&singleProduct.product.images.length > 0 ? (
    singleProduct.product.images.map((image, index) => (
       <Image
         source={{ uri: image.image }} 
         key={index}
-        height={200}
-        width={200}
+        style={styles.ImageList}
+        resizeMode="contain"
       />
     ))
   ) : (
     <Image
       source={{ uri:singleProduct.product.images[0]?.image }} 
-      height={200}
-      width={200}
+     
     />
   )}
 </View>
         </View>
         <View style={styles.productDetails}>
-          <Text style={styles.productName}>ahvaoiudvhad</Text>
-          <Text style={styles.description1}></Text>
-          <Text style={styles.description2}></Text>
-          <Text style={styles.description3}></Text>
-          <Text style={styles.productPrice}></Text>
+          <Text style={styles.productName}>{singleProduct.product.name}</Text>
+          <Text style={styles.description1}>{singleProduct.product.description1}</Text>
+          <Text style={styles.description2}>{singleProduct.product.description2}</Text>
+          <Text style={styles.description3}>{singleProduct.product.description3}</Text>
+          <Text style={styles.productPrice}>{formatPrice(singleProduct.product.price)}</Text>
         </View>
         <View style={styles.btnContainer}>
           <Button title="Add to cart" />
@@ -137,5 +137,33 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#B9D9EB",
     padding: 20,
+  },
+  imageContainer:{
+    display:"flex",
+    flexDirection:"row",
+    gap:2
+  },
+  bigImage:{
+  height:200,
+  position:"absolute",
+  bottom:100,
+  width:250,
+  
+  },
+  bigImageContainer:{
+  height:300,
+  width:250,
+  // backgroundColor:"#fff",
+  },
+  ImageListContainer:{
+  height:300,
+  width:100,
+  display:"flex",
+  gap:10,
+  },
+  ImageList:{
+  height:65,
+  width:100,
+  
   },
 });
