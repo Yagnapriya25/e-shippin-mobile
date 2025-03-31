@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import {
   View,
   Text,
@@ -26,6 +26,8 @@ export default function Home({navigation}) {
   const { categoryInfo, error, loading: categoryLoading } = useSelector((state) => state.category || {});
   const categories = categoryInfo?.categories || [];
 
+  const offerListRef = useRef(null);
+
   const {productInfo}  = useSelector((state) => state.product);
   const product = productInfo?.products || [];
    
@@ -51,6 +53,26 @@ export default function Home({navigation}) {
   }, [dispatch]);
 
 
+  const autoScrollFlatList = (ref, dataLength, delay = 3000) => {
+    let currentIndex = 0;
+    const interval = setInterval(() => {
+      if (ref.current) {
+        ref.current.scrollToIndex({
+          animated: true,
+          index: currentIndex,
+        });
+        currentIndex = (currentIndex + 1) % dataLength; // Loop back to the first item after reaching the end
+      }
+    }, delay);
+
+    return () => clearInterval(interval); // Cleanup the interval when component unmounts
+  };
+
+  // Start auto-scrolling for offers after component mount
+  useEffect(() => {
+    const stopAutoScroll = autoScrollFlatList(offerListRef, offer.length);
+    return stopAutoScroll; // Clean up when the component is unmounted
+  }, [offer]);
 
 
 
@@ -102,6 +124,7 @@ export default function Home({navigation}) {
         <View style={styles.offerContainer}>
           <Text style={styles.offerHeader}>Trending offers</Text>
           <FlatList
+           ref={offerListRef}
             data={offer}
             keyExtractor={(item) => item.id}
             horizontal
