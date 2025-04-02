@@ -11,6 +11,10 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
+import {
+  useFonts,
+  CrimsonPro_800ExtraBold,
+} from "@expo-google-fonts/crimson-pro";
 import { useFocusEffect } from '@react-navigation/native';
 import img from "../assets/Images/logo.png";
 import { Ionicons } from "@expo/vector-icons";
@@ -20,6 +24,11 @@ import { categoryGetAll } from "../Redux/Action/categoryAction";
 import { getAllProduct } from "../Redux/Action/productAction";
 
 export default function Home({navigation}) {
+ let [fontsLoaded] = useFonts({
+    CrimsonPro_800ExtraBold,
+  });
+
+
   const dispatch = useDispatch();
   const [offer, setOffer] = useState(data);
   const [loading, setLoading] = useState(true);
@@ -75,9 +84,7 @@ export default function Home({navigation}) {
   }, [offer]);
 
 
-
-
-  if (loading) {
+  if (loading && !fontsLoaded) {
     return (
       <SafeAreaView style={styles.loadingcontainer}>
         <ActivityIndicator size={"large"}/>
@@ -103,7 +110,8 @@ export default function Home({navigation}) {
         <TextInput placeholder="Search" style={styles.searchInput} />
         <Ionicons name="search" size={20} style={styles.searchIcon} />
       </View>
-      <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 20 }} showsVerticalScrollIndicator={false} 
+      showsHorizontalScrollIndicator={false} >
         <View style={styles.categoryContainer}>
           <Text style={styles.categoryHeader}>Category</Text>
           <FlatList
@@ -187,9 +195,11 @@ const styles = StyleSheet.create({
   },
   logotext: {
     padding: 5,
-    fontSize: 16,
+    fontSize: 20,
     paddingLeft: 10,
     fontWeight: "600",
+    fontFamily: "CrimsonPro_800ExtraBold",
+
   },
   searchContainer: {
     display: "flex",
@@ -214,6 +224,7 @@ const styles = StyleSheet.create({
   categoryHeader: {
     fontSize: 16,
     fontWeight: "bold",
+    fontFamily: "CrimsonPro_800ExtraBold",
   },
   categoryItemContainer: {
     flex: 1,
@@ -231,6 +242,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "500",
     textAlign: "center",
+    fontFamily: "CrimsonPro_800ExtraBold",
+
   },
   offerContainer: {
     paddingTop: 20,
@@ -240,6 +253,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     paddingBottom: 10,
+    fontFamily: "CrimsonPro_800ExtraBold",
   },
   offerItemContainer: {
     flex: 1,
@@ -260,6 +274,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     paddingBottom: 10,
+    fontFamily: "CrimsonPro_800ExtraBold",
   },
   productGrid: {
     flexDirection: 'row',  // Items in a row
@@ -284,6 +299,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: "center",
     marginTop: 10,
+
   },
   productPrice:{
     fontWeight:600

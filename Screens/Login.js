@@ -17,7 +17,6 @@ import { useDispatch } from "react-redux";
 import { login } from "../Redux/Action/userAction";
 import { loginRequest } from "../Redux/Slice/userSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
-import { useNavigation } from "@react-navigation/native";
 
 export default function Login({navigation}) {
   let [fontsLoaded] = useFonts({
