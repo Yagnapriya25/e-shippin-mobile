@@ -164,7 +164,6 @@ export default function ProductDetail({ navigation, route }) {
           </TouchableOpacity>
         </View>
 
-        {/* Success Popup */}
         <SuccessPopup
           visible={popupVisible}
           onClose={() => setPopupVisible(false)} // Close the popup
