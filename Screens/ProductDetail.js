@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FlatList,
   Image,
@@ -8,6 +8,8 @@ import {
   View,
   StyleSheet,
   ActivityIndicator,
+  Modal,
+  Alert,
 } from "react-native";
 import {
   useFonts,
@@ -16,14 +18,38 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { getSingleProduct } from "../Redux/Action/productAction";
 import { ScrollView } from "react-native-gesture-handler";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { postCart } from "../Redux/Action/cartAction";
+
+// Custom Modal Popup for success message
+const SuccessPopup = ({ visible, onClose, message }) => {
+  return (
+    <Modal
+      transparent={true}
+      animationType="fade"
+      visible={visible}
+      onRequestClose={onClose}
+    >
+      <View style={styles.overlay}>
+        <View style={styles.popupContainer}>
+          <Text style={styles.popupMessage}>{message}</Text>
+          <TouchableOpacity style={styles.popupButton} onPress={onClose}>
+            <Text style={styles.popupButtonText}>OK</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+};
 
 export default function ProductDetail({ navigation, route }) {
-
   let [fontsLoaded] = useFonts({
-      CrimsonPro_800ExtraBold,
-    });
+    CrimsonPro_800ExtraBold,
+  });
+
   const [loading, setLoading] = useState(true);
   const [activeDotIndex, setActiveDotIndex] = useState(0);
+  const [popupVisible, setPopupVisible] = useState(false); // State to control popup visibility
   const dispatch = useDispatch();
   const { singleProduct, error } = useSelector((state) => state.product || []);
 
@@ -70,19 +96,31 @@ export default function ProductDetail({ navigation, route }) {
     }).format(roundedPrice);
   };
 
-  if(loading && !fontsLoaded){
-    return(
-      <View>
-      <ActivityIndicator size={"large"}/>
-      </View>
-    )
-  }
+  const handleCart = async (p_id) => {
+    const userInfo = await AsyncStorage.getItem("id");
+    if (loading) return;
+    setLoading(true);
+    await dispatch(postCart(userInfo, p_id))
+      .then(() => {
+        setLoading(false);
+        setPopupVisible(true); // Show the popup after adding to the cart
+      })
+      .catch(() => {
+        console.log(error);
+      });
+  };
 
+  if (loading && !fontsLoaded) {
+    return (
+      <View>
+        <ActivityIndicator size={"large"} />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}  
-        showsHorizontalScrollIndicator={false} >
+      <ScrollView showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>
         <View style={styles.imageSliderContainer}>
           <FlatList
             data={product.images}
@@ -100,10 +138,7 @@ export default function ProductDetail({ navigation, route }) {
           {product.images?.map((_, index) => (
             <View
               key={index}
-              style={[
-                styles.dot,
-                activeDotIndex === index && styles.activeDot, // Highlight active dot
-              ]}
+              style={[styles.dot, activeDotIndex === index && styles.activeDot]}
             />
           ))}
         </View>
@@ -112,29 +147,29 @@ export default function ProductDetail({ navigation, route }) {
           <Text style={styles.productName}>{product.name}</Text>
           <Text style={styles.productPrice}>{formatPrice(product.price)}</Text>
         </View>
+
         <View style={styles.productDetailContainer}>
           <Text style={styles.heading}>Product Detail:</Text>
           <Text style={styles.description1}>⁕ {product.description1}</Text>
           <Text style={styles.description2}>⁕ {product.description2}</Text>
           <Text style={styles.description3}>⁕ {product.description3}</Text>
-          <Text style={styles.description1}>⁕ {product.description1}</Text>
-          <Text style={styles.description2}>⁕ {product.description2}</Text>
-          <Text style={styles.description3}>⁕ {product.description3}</Text>
-          <Text style={styles.description1}>⁕ {product.description1}</Text>
-          <Text style={styles.description2}>⁕ {product.description2}</Text>
-          <Text style={styles.description3}>⁕ {product.description3}</Text>
-          <Text style={styles.description1}>⁕ {product.description1}</Text>
-          <Text style={styles.description2}>⁕ {product.description2}</Text>
-          <Text style={styles.description3}>⁕ {product.description3}</Text>
         </View>
+
         <View style={styles.btnContainer}>
-          <TouchableOpacity style={styles.addToCartBtn}>
+          <TouchableOpacity style={styles.addToCartBtn} onPress={() => handleCart(product._id)}>
             <Text style={styles.btn}>Add to cart</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buyNowBtn}>
+          <TouchableOpacity style={styles.buyNowBtn} onPress={()=>navigation.navigate("Buy")}>
             <Text style={styles.btn}>Buy Now</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Success Popup */}
+        <SuccessPopup
+          visible={popupVisible}
+          onClose={() => setPopupVisible(false)} // Close the popup
+          message="Item added to cart successfully!"
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -145,7 +180,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 20,
     paddingLeft: 20,
-    paddingRight:10,
+    paddingRight: 10,
     backgroundColor: "#B9D9EB",
   },
   imageSliderContainer: {
@@ -191,7 +226,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "500",
     color: "#333",
-
   },
   btnContainer: {
     flexDirection: "row",
@@ -218,7 +252,7 @@ const styles = StyleSheet.create({
   btn: {
     color: "#fff",
     fontFamily: "CrimsonPro_800ExtraBold",
-     fontSize:18,
+    fontSize: 18,
   },
   productDetailContainer: {
     marginTop: 20,
@@ -228,7 +262,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 10,
     fontFamily: "CrimsonPro_800ExtraBold",
-
   },
   description1: {
     fontSize: 16,
@@ -241,5 +274,38 @@ const styles = StyleSheet.create({
   description3: {
     fontSize: 16,
     marginBottom: 5,
+  },
+
+  // Modal styles
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark overlay
+  },
+  popupContainer: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    width: 280,
+    alignItems: "center",
+  },
+  popupMessage: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  popupButton: {
+    backgroundColor: "#FFA500",
+    padding: 10,
+    borderRadius: 5,
+    width: 100,
+    alignItems: "center",
+  },
+  popupButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });

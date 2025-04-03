@@ -18,6 +18,7 @@ import { Provider } from "react-redux";
 import Store from './Redux/Store/Store'
 import ProductDetail from "./Screens/ProductDetail";
 import CategoryProduct from "./Screens/CategoryProduct";
+import BuyPage from "./Screens/BuyPage";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -26,7 +27,6 @@ const Stack = createStackNavigator();
 function TabNavigator() {
   return (
     <Tab.Navigator
-    initialRouteName="AppHome"
       screenOptions={{
         tabBarShowLabel: false,
         tabBarActiveTintColor: "blue",
@@ -111,6 +111,11 @@ export default function App() {
      <Stack.Screen name="product-detail" component={ProductDetail} options={{
       headerShown:true,
       title:"Product"
+      
+     }}/>
+     <Stack.Screen name="Buy" component={BuyPage} options={{
+      headerShown:true,
+      title:"E-shippin"
       
      }}/>
    </Stack.Navigator>

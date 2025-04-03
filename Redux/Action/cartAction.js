@@ -1,4 +1,4 @@
-import { cartDecreaseFail, cartDecreaseRequest, cartDecreaseSuccess, cartIncreaseFail, cartIncreaseRequest, cartIncreaseSuccess, cartPostFail, cartPostRequest, cartPostSuccess, cartRemoveAllFail, cartRemoveAllRequest, cartRemoveAllSuccess, cartRemoveFail, cartRemoveRequest, cartRemoveSuccess, getAllCartFail, getAllCartRequest, getAllCartSuccess } from "../slices/cartSlice"
+import { cartDecreaseFail, cartDecreaseRequest, cartDecreaseSuccess, cartIncreaseFail, cartIncreaseRequest, cartIncreaseSuccess, cartPostFail, cartPostRequest, cartPostSuccess, cartRemoveAllFail, cartRemoveAllRequest, cartRemoveAllSuccess, cartRemoveFail, cartRemoveRequest, cartRemoveSuccess, getAllCartFail, getAllCartRequest, getAllCartSuccess } from "../Slice/cartSlice"
 
 
 
@@ -8,7 +8,7 @@ import { cartDecreaseFail, cartDecreaseRequest, cartDecreaseSuccess, cartIncreas
 const postCart = (userInfo,productInfo)=>async(dispatch)=>{
     try {
         cartPostRequest();
-        const res = await fetch(`${process.env.REACT_APP_URL}/cart/add/${userInfo}/${productInfo}`,{
+        const res = await fetch(`https://e-shipin-server.onrender.com/api/cart/add/${userInfo}/${productInfo}`,{
             method:"PUT",
             headers:{
                 "Content-Type":"application/json"
