@@ -28,14 +28,11 @@ const SuccessPopup = ({ visible, onClose, message }) => {
       transparent={true}
       animationType="fade"
       visible={visible}
-      onRequestClose={onClose}
+      onRequestClose={()=>{}}
     >
       <View style={styles.overlay}>
         <View style={styles.popupContainer}>
           <Text style={styles.popupMessage}>{message}</Text>
-          <TouchableOpacity style={styles.popupButton} onPress={onClose}>
-            <Text style={styles.popupButtonText}>OK</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -103,12 +100,18 @@ export default function ProductDetail({ navigation, route }) {
     await dispatch(postCart(userInfo, p_id))
       .then(() => {
         setLoading(false);
-        setPopupVisible(true); // Show the popup after adding to the cart
+        setPopupVisible(true);
+        
+        setTimeout(() => {
+          setPopupVisible(false); // Close the popup after 5 seconds
+        }, 2000);
       })
       .catch(() => {
         console.log(error);
       });
   };
+
+  
 
   if (loading && !fontsLoaded) {
     return (
@@ -118,6 +121,8 @@ export default function ProductDetail({ navigation, route }) {
     );
   }
 
+
+   
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>
@@ -159,7 +164,7 @@ export default function ProductDetail({ navigation, route }) {
           <TouchableOpacity style={styles.addToCartBtn} onPress={() => handleCart(product._id)}>
             <Text style={styles.btn}>Add to cart</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buyNowBtn} onPress={()=>navigation.navigate("Buy")}>
+          <TouchableOpacity style={styles.buyNowBtn} onPress={()=>navigation.navigate("Buy",{p_id:product._id})}>
             <Text style={styles.btn}>Buy Now</Text>
           </TouchableOpacity>
         </View>
@@ -167,7 +172,7 @@ export default function ProductDetail({ navigation, route }) {
         <SuccessPopup
           visible={popupVisible}
           onClose={() => setPopupVisible(false)} // Close the popup
-          message="Item added to cart successfully!"
+          message="❤️❤️Item added to cart successfully!❤️❤️"
         />
       </ScrollView>
     </SafeAreaView>
@@ -278,33 +283,24 @@ const styles = StyleSheet.create({
   // Modal styles
   overlay: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent:"center",
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark overlay
   },
   popupContainer: {
     backgroundColor: "white",
-    padding: 20,
+    padding: 10,
+    margin:30,
     borderRadius: 10,
-    width: 280,
+    width: 300,
     alignItems: "center",
   },
   popupMessage: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#333",
+    paddingTop:20,
     marginBottom: 20,
     textAlign: "center",
   },
-  popupButton: {
-    backgroundColor: "#FFA500",
-    padding: 10,
-    borderRadius: 5,
-    width: 100,
-    alignItems: "center",
-  },
-  popupButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
+ 
 });
