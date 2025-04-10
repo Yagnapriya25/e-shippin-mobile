@@ -1,4 +1,4 @@
-import { addressEditFail, addressEditRequest, addressEditSuccess, addressGetFail, addressGetRequest, addressGetSuccess, addressPostFail, addressPostRequest, addressPostSuccess, addressRemoveFail, addressRemoveRequest, addressRemoveSuccess } from "../slices/addressSlice";
+import { addressEditFail, addressEditRequest, addressEditSuccess, addressGetFail, addressGetRequest, addressGetSuccess, addressPostFail, addressPostRequest, addressPostSuccess, addressRemoveFail, addressRemoveRequest, addressRemoveSuccess } from "../Slice/addressSlice";
 
 
 
@@ -44,11 +44,9 @@ const postAddress = (credential,userInfo) => async(dispatch)=>{
 const getAddress = (userInfo)=>async(dispatch)=>{
     try {
         dispatch(addressGetRequest());
-        const res = await fetch(`${process.env.REACT_APP_URL}/address/get/${userInfo}`,{
+        const res = await fetch(`https://e-shipin-server.onrender.com/api/address/get/${userInfo}`,{
             method:"GET",
-            // headers:{
-            //     "Content-Type":"application/json"
-            // }
+           
         })
         const data = await res.json();
         console.log(data);
