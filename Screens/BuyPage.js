@@ -42,6 +42,17 @@ export default function BuyPage({ navigation,route }) {
       fetchAddress();
   },[dispatch])
  
+  const wrapText = (text) => text.replace(/(.{10})/g, '$1\u200B');
+
+  const formatePrice=(price)=>{
+    const roundPrice = Math.round(price);
+    return new Intl.NumberFormat('en-IN',{
+      style:"currency",
+      currency:"INR",
+      maximumFractionDigits:0,
+
+    }).format(roundPrice)
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -50,6 +61,7 @@ export default function BuyPage({ navigation,route }) {
         {
           addressInfo?.address ? (
             <View>
+              <Text style={{fontWeight:"700"}}>Address :</Text>
               <Text style={styles.name}>{addressInfo.address.name}</Text>
               <Text style={styles.city}>{addressInfo.address.city}</Text>
               <Text style={styles.landmark}>{addressInfo.address.landmark}</Text>
@@ -66,11 +78,11 @@ export default function BuyPage({ navigation,route }) {
         </View>
         {
         addressInfo?.address?(
-        <TouchableOpacity onPress={() => handleAddAddress()}>
+        <TouchableOpacity onPress={() => handleAddAddress()} style={styles.addAdressContainer}>
           <Text style={styles.addAdress}>Edit</Text>
         </TouchableOpacity>
         ) : (
-         <TouchableOpacity onPress={() => handleAddAddress()}>
+         <TouchableOpacity onPress={() => handleAddAddress()} style={styles.addAdressContainer}>
           <Text style={styles.addAdress}>Add</Text>
         </TouchableOpacity>
         )
@@ -84,10 +96,10 @@ export default function BuyPage({ navigation,route }) {
       <View style={styles.productDetailContainer}>
       <Text style={styles.productName}>{singleProduct.product.name}</Text>
       <Text style={styles.productCategoryName}>{singleProduct.product.category.name}</Text>
-      <Text style={styles.productDescrition1}>{singleProduct.product.description1}</Text>
+      <Text style={styles.productDescrition1} > {wrapText(singleProduct.product.description1)}</Text>
       </View>
      <View style={styles.productPriceContainer}>
-             <Text style={styles.productPrice}>{singleProduct.product.price}</Text>
+             <Text style={styles.productPrice}>{formatePrice(singleProduct.product.price)}</Text>
      </View>
       </View>
       <TouchableOpacity style={styles.btnContainer}>
@@ -119,6 +131,21 @@ const styles = StyleSheet.create({
     flexDirection:"row",
     borderRadius:10
   },
+  addAdressContainer:{
+    display:"flex",
+    marginTop:50,
+    marginLeft:40
+  },
+  addAdress:{
+   paddingHorizontal:14,
+   paddingVertical:5,
+   backgroundColor:"#007FFF",
+   color:"#fff",
+   width:55,
+   height:30,
+   borderRadius:6,
+   fontWeight:"600"
+  },
   productContainer:{
    display:"flex",
    flexDirection:"row",
@@ -126,5 +153,28 @@ const styles = StyleSheet.create({
    backgroundColor:"#fff",
    padding:10,
    borderRadius:10
-  }
+  },
+ productDetailContainer: {
+  paddingHorizontal: 8,
+  flexShrink: 1,
+  flexGrow: 1,  
+},
+  productName:{
+    fontWeight:"600",
+    paddingBottom:5
+  },
+  productCategoryName:{
+    color:"grey"
+  },
+  productDescrition1:{
+    paddingVertical:8,
+  },
+  productPrice:{
+    fontWeight:"800"
+  },
+  btnContainer:{
+   marginHorizontal:"40%",
+   marginVertical:"20%",
+ },
+ 
 });
