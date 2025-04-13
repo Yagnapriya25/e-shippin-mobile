@@ -19,6 +19,8 @@ import Store from './Redux/Store/Store'
 import ProductDetail from "./Screens/ProductDetail";
 import CategoryProduct from "./Screens/CategoryProduct";
 import BuyPage from "./Screens/BuyPage";
+import AddAddress from "./Screens/AddAddress";
+import EditAddress from "./Screens/EditAddress";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -118,6 +120,14 @@ export default function App() {
       title:"E-shippin"
       
      }}/>
+     <Stack.Screen name="addAddress" component={AddAddress} options={{
+      headerShown:true,
+      title:"E-shippin"}}/>
+
+      <Stack.Screen name="editAddress" component={EditAddress} options={{
+        headerShown:true,
+        title:"E-shippin"
+      }}/>
    </Stack.Navigator>
      </NavigationContainer>
     </Provider>
