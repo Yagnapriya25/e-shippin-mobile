@@ -14,10 +14,21 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.karthiknkrr.eshippin"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "splash": {
+      "image": "./assets/splashscreen_logo.png",  
+      "resizeMode": "contain", 
+      "backgroundColor": "#ffffff"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ed89538e-bb53-4f0d-a33a-3465a80eb064"
+      }
     }
   }
 }
