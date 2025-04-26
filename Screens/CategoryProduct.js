@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Text, SafeAreaView, StyleSheet,View,Image } from "react-native";
+import { Text, SafeAreaView, StyleSheet,View,Image, Pressable } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { getCategoryProducts } from "../Redux/Action/categoryAction";
 
@@ -27,17 +27,21 @@ export default function CategoryProduct({navigation,route}){
           <View style={styles.productContainer}>
                   <View style={styles.productGrid}>
                     {product.map((item) => (
-                      <View key={item._id} style={styles.productItemContainer}>
-                        <Image
-                          source={{
-                            uri: item.images && item.images.length > 0 ? item.images[0].image : 'https://path/to/default/image.png'
-                          }}
-                          style={styles.productImage}
-                        />
-                        <Text style={styles.productName}>{item.name}</Text>
-                        <Text style={styles.productPrice}>₹{item.price}</Text>
+                      <Pressable key={item._id} style={styles.productItemContainer} onPress={()=>navigation.navigate("product-detail",{p_id:item._id})}>
                         
+                      <View>
+                      <Image
+                      source={{
+                        uri: item.images && item.images.length > 0 ? item.images[0].image : 'https://path/to/default/image.png'
+                      }}
+                      style={styles.productImage}
+                    />
+                    <Text style={styles.productName}>{item.name}</Text>
+                    <Text style={styles.productPrice}>₹{item.price}</Text>
                       </View>
+                    
+                        
+                      </Pressable>
                     ))}
                   </View>
                 </View>

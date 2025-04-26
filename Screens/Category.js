@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, StyleSheet, Image, TextInput, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, SafeAreaView, StyleSheet, Image, TextInput, ScrollView, ActivityIndicator, Pressable } from 'react-native';
 import img from "../assets/Images/logo.png";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from 'react';
@@ -43,10 +43,10 @@ export default function Category({navigation}) {
                 <View style={styles.categoryContainer}>
                     {categories.length > 0 ? (
                         categories.map((item) => (
-                            <View key={item._id} style={styles.categoryItem}>
+                            <Pressable key={item._id} style={styles.categoryItem} onPress={()=>navigation.navigate("category-product",{cat_id:item.id})}>
                                 <Image source={{ uri: item.photo }} style={styles.categoryImage} resizeMode='contain'/>
                                 <Text style={styles.categoryName}>{item.name}</Text>
-                            </View>
+                            </Pressable>
                         ))
                     ) : (
                         <Text>No categories available</Text>
