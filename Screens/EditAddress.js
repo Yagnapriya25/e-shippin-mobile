@@ -121,7 +121,7 @@ export default function EditAddress({ navigation }) {
         />
       </View>
       <Pressable style={styles.btnContainer} onPress={handleSubmit}>
-        <Text style={styles.btn}>{loading ? "Loading..." : "Edit"}</Text>
+        <Text style={styles.btn}>{loading ? "Updating..." : "Update"}</Text>
       </Pressable>
     </SafeAreaView>
   );

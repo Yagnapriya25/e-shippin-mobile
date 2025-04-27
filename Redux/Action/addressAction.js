@@ -20,7 +20,7 @@ const postAddress = (credential,userInfo) => async(dispatch)=>{
         formData.append("phoneNumber",credential.phoneNumber);
         formData.append("user", userInfo);
         
-        const res = await fetch(`${process.env.REACT_APP_URL}/address/create/${userInfo}`,{
+        const res = await fetch(`https://e-shipin-server.onrender.com/api/address/create/${userInfo}`,{
             method:"POST",
             body:formData,
            
