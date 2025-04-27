@@ -21,6 +21,7 @@ import CategoryProduct from "./Screens/CategoryProduct";
 import BuyPage from "./Screens/BuyPage";
 import AddAddress from "./Screens/AddAddress";
 import EditAddress from "./Screens/EditAddress";
+import AddCategory from "./Screens/AddCategory";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -128,7 +129,15 @@ export default function App() {
         headerShown:true,
         title:"E-shippin"
       }}/>
-   </Stack.Navigator>
+
+      <Stack.Screen name="addCategory" component={AddCategory} options={{
+        headerShown:true,
+        title:"E-shippin"
+      }}/>
+
+
+     </Stack.Navigator>
+   
      </NavigationContainer>
     </Provider>
    
