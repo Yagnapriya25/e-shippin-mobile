@@ -72,7 +72,7 @@ const editAddress = (credential,userInfo)=>async(dispatch)=>{
         formData.append("pincode",credential.pincode);
         formData.append("landmark",credential.landmark);
         formData.append("phoneNumber",credential.phoneNumber);
-        const res = await fetch(`${process.env.REACT_APP_URL}/address/edit/${userInfo}`,{
+        const res = await fetch(`https://e-shipin-server.onrender.com/api/address/edit/${userInfo}`,{
             method:"PUT",
             body:formData,
             
