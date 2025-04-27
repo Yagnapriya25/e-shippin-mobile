@@ -1,30 +1,35 @@
-import { View, Text, SafeAreaView, StyleSheet, Image, TextInput, ScrollView, ActivityIndicator, Pressable } from 'react-native';
+import { View, Text, SafeAreaView, StyleSheet, Image, TextInput, ScrollView, ActivityIndicator, Pressable, RefreshControl } from 'react-native';
 import img from "../assets/Images/logo.png";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { categoryGetAll } from '../Redux/Action/categoryAction';
+import { useFocusEffect } from '@react-navigation/native';
 
-export default function Category({navigation}) {
-    const [loading, setLoading] = useState(true);
+export default function Category({ navigation }) {
     const dispatch = useDispatch();
     const { categoryInfo, error, loading: categoryLoading } = useSelector((state) => state.category || {});
-     const categories = categoryInfo?.categories || [];
+    const categories = categoryInfo?.categories || [];
+    const [refreshing, setRefreshing] = useState(false);
 
+    // Fetch categories whenever screen comes into focus
+    useFocusEffect(
+        useCallback(() => {
+            dispatch(categoryGetAll());
+        }, [dispatch])
+    );
 
-    useEffect(() => {
-        const fetchData = async () => {
-          await dispatch (categoryGetAll()).finally(()=>{
-            setLoading(false)
-          })
-        }
-        fetchData();
-    }, [dispatch]);
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await dispatch(categoryGetAll());
+        setRefreshing(false);
+    };
 
-    if (loading) {
+    if (categoryLoading && !categories.length) {
+        // Only show loader if loading and no data yet
         return (
-        <SafeAreaView style={styles.loadingcontainer}>
-              <ActivityIndicator size={"large"}/>
+            <SafeAreaView style={styles.loadingcontainer}>
+                <ActivityIndicator size="large" />
             </SafeAreaView>
         );
     }
@@ -35,16 +40,26 @@ export default function Category({navigation}) {
                 <Image source={img} style={styles.logo} />
                 <Text style={styles.logotext}>E-shippin</Text>
             </View>
+
             <View style={styles.searchContainer}>
                 <TextInput placeholder="Search" style={styles.searchInput} />
                 <Ionicons name="search" size={20} style={styles.searchIcon} />
             </View>
-            <ScrollView>
+
+            <ScrollView
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+            >
                 <View style={styles.categoryContainer}>
                     {categories.length > 0 ? (
                         categories.map((item) => (
-                            <Pressable key={item._id} style={styles.categoryItem} onPress={()=>navigation.navigate("category-product",{cat_id:item.id})}>
-                                <Image source={{ uri: item.photo }} style={styles.categoryImage} resizeMode='contain'/>
+                            <Pressable 
+                                key={item._id} 
+                                style={styles.categoryItem} 
+                                onPress={() => navigation.navigate("category-product", { cat_id: item._id })}
+                            >
+                                <Image source={{ uri: item.photo }} style={styles.categoryImage} resizeMode="contain" />
                                 <Text style={styles.categoryName}>{item.name}</Text>
                             </Pressable>
                         ))
@@ -58,22 +73,21 @@ export default function Category({navigation}) {
 }
 
 const styles = StyleSheet.create({
-    loadingcontainer:{
-        display:"flex",
-        justifyContent:"center",
-        alignItems:"center",
-        flex:1,
-        backgroundColor:"#B9D9EB"
-      },
+    loadingcontainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#B9D9EB"
+    },
     container: {
         flex: 1,
         paddingTop: 40,
         backgroundColor: "#B9D9EB",
     },
     header: {
-        display: "flex",
         flexDirection: "row",
         paddingHorizontal: 30,
+        alignItems: "center",
     },
     logo: {
         height: 30,
@@ -86,52 +100,50 @@ const styles = StyleSheet.create({
         fontWeight: "600",
     },
     searchContainer: {
-        display: "flex",
         flexDirection: "row",
         paddingTop: 10,
         paddingHorizontal: 30,
+        alignItems: "center",
     },
     searchInput: {
-        width: 280,
+        flex: 1,
         backgroundColor: "#fff",
         borderRadius: 10,
         paddingLeft: 10,
+        height: 40,
     },
     searchIcon: {
-        padding: 5,
-        paddingTop: 10,
+        marginLeft: 10,
+        marginTop: 5,
     },
     categoryContainer: {
-        paddingTop: 20,
-        display:"flex",
-        flexWrap:"wrap",
-        flexDirection:"row",
-        padding:20,
-        alignItems:"center",
-        justifyContent:"center"
-       
-      
+        flexDirection: "row",
+        flexWrap: "wrap",
+        padding: 20,
+        justifyContent: "center",
     },
     categoryItem: {
-        marginBottom: 15,
-        margin:5,
-        backgroundColor:"#FFFFFf",
-        borderRadius:10,
-        height:150,
-        width:150,
-        display:"flex",
-        justifyContent:"center",
-        alignItems:"center"
-        
+        margin: 5,
+        backgroundColor: "#FFFFFF",
+        borderRadius: 10,
+        height: 150,
+        width: 150,
+        justifyContent: "center",
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 5,
     },
     categoryImage: {
-        width: 150,
-        height: 100,
+        width: 120,
+        height: 80,
     },
     categoryName: {
         marginTop: 10,
         fontSize: 16,
         fontWeight: "500",
-        
+        textAlign: "center",
     }
 });
