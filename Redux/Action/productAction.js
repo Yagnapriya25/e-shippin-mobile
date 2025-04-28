@@ -26,12 +26,9 @@ const productPost = (credential, categoryInfo, userInfo) => async (dispatch) => 
     try {
         dispatch(productPostRequest());
 
-        const res = await fetch(`${process.env.REACT_APP_URL}/product/create/${categoryInfo}/${userInfo}`, {
+        const res = await fetch(`https://e-shipin-server.onrender.com/api/product/create/${categoryInfo}/${userInfo}`, {
             method: "POST",
-            headers: {
-                // 'Content-Type' should be omitted when using FormData
-            },
-            body: credential // Send FormData directly
+            body: credential 
         });
 
         const data = await res.json();

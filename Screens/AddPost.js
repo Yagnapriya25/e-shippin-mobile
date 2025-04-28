@@ -47,7 +47,7 @@ export default function AddPost({ navigation }) {
         <View style={styles.categoryContainer}>
           {categories.length > 0 ? (
             categories.map((item) => (
-              <Pressable key={item._id} style={styles.categoryItem} onPress={()=>handleNavigate(item_id)}>
+              <Pressable key={item._id} style={styles.categoryItem} onPress={()=>navigation.navigate("addProduct",{c_id:item._id})}>
                 <Image
                   source={{ uri: item.photo }}
                   style={styles.categoryImage}
