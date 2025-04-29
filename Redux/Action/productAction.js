@@ -35,12 +35,15 @@ const productPost = (credential, categoryInfo, userInfo) => async (dispatch) => 
         console.log(data);
         if (res.ok) {
             dispatch(productPostSuccess(data));
+            return { success: true, data };
         } else {
             dispatch(productPostFail(data.message || "Failed to create product"));
+            return { success: false, error: data.message };
         }
 
     } catch (error) {
         dispatch(productPostFail(error.message));
+        return { success: false, error: error.message };
     }
 };
 

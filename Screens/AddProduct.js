@@ -1,35 +1,38 @@
-import { View, Text, SafeAreaView, StyleSheet, TextInput, Button, ScrollView, Image, ActivityIndicator, Alert } from "react-native";
-import { useState, useEffect } from "react";
-import * as ImagePicker from 'expo-image-picker';
-import { useDispatch, useSelector } from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // 👈 AsyncStorage import
+import React, { useEffect, useState } from "react";
+import { View, TextInput, Button, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { useDispatch } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage"; 
 import { productPost } from "../Redux/Action/productAction";
 
-export default function AddProduct({ navigation, route }) {
-  const c_id = route.params;
-  console.log('Category ID:', c_id);
+export default function AddProductScreen({ navigation, route }) {
+  const [credential, setCredential] = useState({
+    name: "",
+    description1: "",
+    description2: "",
+    description3: "",
+    price: "",
+    instock: "",
+    images: [],
+  });
+  const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState("");
 
   const dispatch = useDispatch();
-  const { loading, error, success } = useSelector(state => state.product);
 
-  const [userId, setUserId] = useState(null); // 👈 for user id
-  const [productName, setProductName] = useState('');
-  const [quantity, setQuantity] = useState('');
-  const [price, setPrice] = useState('');
-  const [description1, setDescription1] = useState('');
-  const [description2, setDescription2] = useState('');
-  const [description3, setDescription3] = useState('');
-  const [images, setImages] = useState([]);
+  const { c_id } = route.params; // category ID passed from previous screen
 
   useEffect(() => {
     const getUserId = async () => {
       try {
-        const id = await AsyncStorage.getItem('id');
-        if (id) {
+        const id = await AsyncStorage.getItem("id");
+        if (id !== null) {
           setUserId(id);
+        } else {
+          console.log("No user id found in AsyncStorage");
         }
-      } catch (err) {
-        console.log('Error fetching user ID:', err);
+      } catch (error) {
+        console.error("Error fetching user id:", error);
       }
     };
 
@@ -38,167 +41,203 @@ export default function AddProduct({ navigation, route }) {
 
   const pickImages = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Permission is required!');
+    if (status !== "granted") {
+      alert("Permission to access media library is required!");
       return;
     }
 
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    const result = await ImagePicker.launchImageLibraryAsync({
       allowsMultipleSelection: true,
-      selectionLimit: 5,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
     });
 
     if (!result.canceled) {
-      setImages(result.assets.map(asset => asset.uri));
+      let selectedImages = result.assets.map((asset) => ({
+        uri: asset.uri,
+        name: asset.fileName || `photo-${Date.now()}.jpg`,
+        type: asset.type || "image/jpeg",
+      }));
+
+      setCredential((prev) => ({
+        ...prev,
+        images: [...prev.images, ...selectedImages],
+      }));
     }
   };
 
-  const handleSubmit = () => {
-    if (!productName || !quantity || !price || images.length === 0) {
-      Alert.alert("Error", "Please fill all fields and select images.");
+  const handleInputChange = (name, value) => {
+    setCredential((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const removeImage = (index) => {
+    Alert.alert(
+      "Remove Image",
+      "Are you sure you want to remove this image?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Remove",
+          style: "destructive",
+          onPress: () => {
+            setCredential((prev) => ({
+              ...prev,
+              images: prev.images.filter((_, i) => i !== index),
+            }));
+          },
+        },
+      ]
+    );
+  };
+
+  const handleSubmit = async () => {
+    if (loading) return;
+
+    // Check if required fields are filled
+    if (!credential.name || !credential.price || !credential.instock) {
+      alert("Please fill Name, Price, and Stock properly.");
       return;
     }
-  
-    // Create FormData to send with the request
+
     const formData = new FormData();
-    formData.append('name', productName);
-    formData.append('quantity', quantity);
-    formData.append('price', price);
-    formData.append('description1', description1);
-    formData.append('description2', description2);
-    formData.append('description3', description3);
-    formData.append('instock', quantity);
-  
-    // Add images to FormData
-    images.forEach((uri) => {
-      const fileName = uri.split('/').pop();
-      const fileType = fileName.split('.').pop();
-      
-      formData.append('images', {
-        uri,
-        name: fileName,
-        type: `image/${fileType}`,
+    formData.append("name", credential.name);
+    formData.append("description1", credential.description1);
+    formData.append("description2", credential.description2);
+    formData.append("description3", credential.description3);
+    formData.append("price", credential.price);
+    formData.append("instock", credential.instock);
+
+    // Log credential data before appending images
+    console.log("Form Data Before Images: ", credential);
+
+    credential.images.forEach((img, index) => {
+      formData.append("images", {
+        uri: img.uri,
+        name: img.name,
+        type: img.type,
       });
     });
-  
-    // Check if userId exists in AsyncStorage
-    if (!userId) {
-      Alert.alert('Error', 'User ID not found!');
-      return;
+
+    // Log the images data after appending
+    console.log("Form Data After Images: ");
+    for (let pair of formData.entries()) {
+      console.log(pair[0], ":", pair[1]);
     }
-  
-    // Dispatch Redux action with FormData, categoryInfo, and userInfo
-    dispatch(productPost(formData, c_id, userId)); 
+
+    console.log("--- cat_id ---", c_id);
+    console.log("--- userId ---", userId);
+
+    // Log image URIs to inspect them
+    console.log("Image URIs: ", credential.images.map(img => img.uri));
+
+    try {
+      setLoading(true);
+
+      // Send the request to the backend
+      const result = await dispatch(productPost(formData, c_id, userId)); 
+
+      // Log the result from dispatch
+      console.log("--- Dispatch Result ---", result);
+
+      setLoading(false);
+
+      // Check if the product was added successfully
+      if (result?.type?.includes("Success")) {
+        alert("Product added successfully!");
+        navigation.navigate("Home");
+      } else {
+        alert("Failed to add product. Check details in console.");
+      }
+
+    } catch (error) {
+      console.error("Error submitting product:", error);
+      setLoading(false);
+      alert("Failed to add product. Try again.");
+    }
   };
-  
-
-  useEffect(() => {
-    if (success) {
-      Alert.alert('Success', 'Product Added Successfully!');
-      navigation.goBack(); // or wherever you want to navigate
-    }
-
-    if (error) {
-      Alert.alert('Error', error);
-    }
-  }, [success, error]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.heading}>Add Product</Text>
+    <ScrollView contentContainerStyle={{ padding: 20 }}>
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <>
+          <TouchableOpacity onPress={pickImages} style={{ marginBottom: 15 }}>
+            <Text style={{ color: "blue", fontSize: 18 }}>Pick Images</Text>
+          </TouchableOpacity>
 
-        <Button title="Pick Images" onPress={pickImages} />
+          <View style={{ flexDirection: "row", flexWrap: "wrap", marginBottom: 20 }}>
+            {credential.images.map((img, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => removeImage(index)}
+                style={{ marginRight: 10, marginBottom: 10 }}
+              >
+                <Image
+                  source={{ uri: img.uri }}
+                  style={{ width: 100, height: 100, borderRadius: 10 }}
+                />
+                <Text style={{ textAlign: "center", fontSize: 12, color: "red" }}>Remove</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
-        <ScrollView horizontal style={{ marginVertical: 20 }}>
-          {images.map((uri, index) => (
-            <Image
-              key={index}
-              source={{ uri }}
-              style={styles.imagePreview}
-            />
-          ))}
-        </ScrollView>
+          <TextInput
+            placeholder="Product Name"
+            value={credential.name}
+            onChangeText={(text) => handleInputChange("name", text)}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Stock Quantity"
+            value={credential.instock}
+            keyboardType="numeric"
+            onChangeText={(text) => handleInputChange("instock", text)}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Price"
+            value={credential.price}
+            keyboardType="numeric"
+            onChangeText={(text) => handleInputChange("price", text)}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Description 1"
+            value={credential.description1}
+            onChangeText={(text) => handleInputChange("description1", text)}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Description 2"
+            value={credential.description2}
+            onChangeText={(text) => handleInputChange("description2", text)}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Description 3"
+            value={credential.description3}
+            onChangeText={(text) => handleInputChange("description3", text)}
+            style={styles.input}
+          />
 
-        <TextInput
-          placeholder="Product Name"
-          value={productName}
-          onChangeText={setProductName}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Quantity"
-          value={quantity}
-          onChangeText={setQuantity}
-          keyboardType="numeric"
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Price"
-          value={price}
-          onChangeText={setPrice}
-          keyboardType="numeric"
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Description 1"
-          value={description1}
-          onChangeText={setDescription1}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Description 2"
-          value={description2}
-          onChangeText={setDescription2}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Description 3"
-          value={description3}
-          onChangeText={setDescription3}
-          style={styles.input}
-        />
-
-        {loading ? (
-          <ActivityIndicator size="large" color="#6C63FF" style={{ marginTop: 20 }} />
-        ) : (
-          <Button title="Submit Product" onPress={handleSubmit} />
-        )}
-      </ScrollView>
-    </SafeAreaView>
+          <Button title="Add Product" onPress={handleSubmit} disabled={loading} />
+        </>
+      )}
+    </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#B9D9EB",
-    paddingTop: 40,
-  },
-  scrollContainer: {
-    alignItems: "center",
-    paddingBottom: 20,
-  },
-  heading: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
+const styles = {
   input: {
-    width: "90%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    backgroundColor: "#fff",
-    padding: 10,
-    marginBottom: 15,
-    borderRadius: 8,
-  },
-  imagePreview: {
-    width: 50,
     height: 50,
-    marginRight: 10,
+    borderColor: "gray",
+    borderWidth: 1,
     borderRadius: 10,
+    paddingHorizontal: 10,
+    marginBottom: 15,
   },
-});
+};

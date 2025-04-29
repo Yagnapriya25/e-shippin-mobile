@@ -143,7 +143,6 @@ export default function BuyPage({ navigation, route }) {
       const verificationData = await verificationResponse.json();
 
       if (verificationResponse.ok) {
-        alert("Payment Successful!");
         console.log("Verified Payment: ", verificationData);
       } else {
         alert("Payment verification failed!");

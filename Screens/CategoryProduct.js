@@ -87,6 +87,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   productPrice:{
-    fontWeight:600
+    fontWeight:600,
+    textAlign: "center",
   }
 })
