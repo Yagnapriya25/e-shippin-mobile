@@ -1,9 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { View, TextInput, Button, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
+import {
+  View,
+  TextInput,
+  Button,
+  Text,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 import { useDispatch } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage"; 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { productPost } from "../Redux/Action/productAction";
+import mime from "mime";
 
 export default function AddProductScreen({ navigation, route }) {
   const [credential, setCredential] = useState({
@@ -19,8 +31,7 @@ export default function AddProductScreen({ navigation, route }) {
   const [userId, setUserId] = useState("");
 
   const dispatch = useDispatch();
-
-  const { c_id } = route.params; // category ID passed from previous screen
+  const { c_id } = route.params;
 
   useEffect(() => {
     const getUserId = async () => {
@@ -56,7 +67,7 @@ export default function AddProductScreen({ navigation, route }) {
       let selectedImages = result.assets.map((asset) => ({
         uri: asset.uri,
         name: asset.fileName || `photo-${Date.now()}.jpg`,
-        type: asset.type || "image/jpeg",
+        type: mime.getType(asset.uri) || "image/jpeg",
       }));
 
       setCredential((prev) => ({
@@ -74,44 +85,37 @@ export default function AddProductScreen({ navigation, route }) {
   };
 
   const removeImage = (index) => {
-    Alert.alert(
-      "Remove Image",
-      "Are you sure you want to remove this image?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Remove",
-          style: "destructive",
-          onPress: () => {
-            setCredential((prev) => ({
-              ...prev,
-              images: prev.images.filter((_, i) => i !== index),
-            }));
-          },
+    Alert.alert("Remove Image", "Are you sure?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Remove",
+        style: "destructive",
+        onPress: () => {
+          setCredential((prev) => ({
+            ...prev,
+            images: prev.images.filter((_, i) => i !== index),
+          }));
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleSubmit = async () => {
     if (loading) return;
 
-    // Check if required fields are filled
     if (!credential.name || !credential.price || !credential.instock) {
-      alert("Please fill Name, Price, and Stock properly.");
+      alert("Please fill Name, Price, and Stock.");
       return;
     }
 
     const formData = new FormData();
+
     formData.append("name", credential.name);
     formData.append("description1", credential.description1);
     formData.append("description2", credential.description2);
     formData.append("description3", credential.description3);
     formData.append("price", credential.price);
     formData.append("instock", credential.instock);
-
-    // Log credential data before appending images
-    console.log("Form Data Before Images: ", credential);
 
     credential.images.forEach((img, index) => {
       formData.append("images", {
@@ -121,37 +125,20 @@ export default function AddProductScreen({ navigation, route }) {
       });
     });
 
-    // Log the images data after appending
-    console.log("Form Data After Images: ");
-    for (let pair of formData.entries()) {
-      console.log(pair[0], ":", pair[1]);
-    }
-
-    console.log("--- cat_id ---", c_id);
-    console.log("--- userId ---", userId);
-
-    // Log image URIs to inspect them
-    console.log("Image URIs: ", credential.images.map(img => img.uri));
-
     try {
       setLoading(true);
 
-      // Send the request to the backend
-      const result = await dispatch(productPost(formData, c_id, userId)); 
-
-      // Log the result from dispatch
+      const result = await dispatch(productPost(formData, c_id, userId));
       console.log("--- Dispatch Result ---", result);
 
       setLoading(false);
 
-      // Check if the product was added successfully
-      if (result?.type?.includes("Success")) {
+      if (result?.success) {
         alert("Product added successfully!");
         navigation.navigate("Home");
       } else {
-        alert("Failed to add product. Check details in console.");
+        alert("Failed to add product. See console for details.");
       }
-
     } catch (error) {
       console.error("Error submitting product:", error);
       setLoading(false);
@@ -169,7 +156,13 @@ export default function AddProductScreen({ navigation, route }) {
             <Text style={{ color: "blue", fontSize: 18 }}>Pick Images</Text>
           </TouchableOpacity>
 
-          <View style={{ flexDirection: "row", flexWrap: "wrap", marginBottom: 20 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              marginBottom: 20,
+            }}
+          >
             {credential.images.map((img, index) => (
               <TouchableOpacity
                 key={index}
@@ -180,7 +173,11 @@ export default function AddProductScreen({ navigation, route }) {
                   source={{ uri: img.uri }}
                   style={{ width: 100, height: 100, borderRadius: 10 }}
                 />
-                <Text style={{ textAlign: "center", fontSize: 12, color: "red" }}>Remove</Text>
+                <Text
+                  style={{ textAlign: "center", fontSize: 12, color: "red" }}
+                >
+                  Remove
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
