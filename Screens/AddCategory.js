@@ -1,9 +1,16 @@
-import { View,Text } from "react-native";
+import { View,Text, StyleSheet } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function AddCategory({navigation}){
     return(
-        <View>
-        <Text>AddCategory</Text>
-        </View>
+        <ScrollView style={styles.container}>
+        
+        </ScrollView>
     )
 }
+
+const styles = StyleSheet.create({
+    container:{
+        backgroundColor:"#B9D9EB"
+    }
+})

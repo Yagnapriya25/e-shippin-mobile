@@ -59,9 +59,6 @@ export default function AddPost({ navigation }) {
           ) : (
             <Text>No categories available</Text>
           )}
-          <Pressable style={styles.categoryItem} onPress={()=>navigation.navigate("addCategory")}>
-            <Ionicons name="add" size={50} style={styles.searchIcon} />
-          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>
