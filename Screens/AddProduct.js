@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  StyleSheet,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
@@ -51,31 +52,74 @@ export default function AddProductScreen({ navigation, route }) {
   }, []);
 
   const pickImages = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      alert("Permission to access media library is required!");
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsMultipleSelection: true,
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      let selectedImages = result.assets.map((asset) => ({
-        uri: asset.uri,
-        name: asset.fileName || `photo-${Date.now()}.jpg`,
-        type: mime.getType(asset.uri) || "image/jpeg",
-      }));
-
-      setCredential((prev) => ({
-        ...prev,
-        images: [...prev.images, ...selectedImages],
-      }));
-    }
+    Alert.alert(
+      "Select Image",
+      "Choose an option",
+      [
+        {
+          text: "Camera",
+          onPress: async () => {
+            const { status } = await ImagePicker.requestCameraPermissionsAsync();
+            if (status !== "granted") {
+              alert("Camera permission is required!");
+              return;
+            }
+  
+            const result = await ImagePicker.launchCameraAsync({
+              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+              quality: 1,
+            });
+  
+            if (!result.canceled) {
+              const asset = result.assets[0];
+              const newImage = {
+                uri: asset.uri,
+                name: asset.fileName || `photo-${Date.now()}.jpg`,
+                type: mime.getType(asset.uri) || "image/jpeg",
+              };
+  
+              setCredential((prev) => ({
+                ...prev,
+                images: [...prev.images, newImage],
+              }));
+            }
+          },
+        },
+        {
+          text: "Gallery",
+          onPress: async () => {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== "granted") {
+              alert("Gallery permission is required!");
+              return;
+            }
+  
+            const result = await ImagePicker.launchImageLibraryAsync({
+              allowsMultipleSelection: true,
+              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+              quality: 1,
+            });
+  
+            if (!result.canceled) {
+              let selectedImages = result.assets.map((asset) => ({
+                uri: asset.uri,
+                name: asset.fileName || `photo-${Date.now()}.jpg`,
+                type: mime.getType(asset.uri) || "image/jpeg",
+              }));
+  
+              setCredential((prev) => ({
+                ...prev,
+                images: [...prev.images, ...selectedImages],
+              }));
+            }
+          },
+        },
+        { text: "Cancel", style: "cancel" },
+      ],
+      { cancelable: true }
+    );
   };
+  
 
   const handleInputChange = (name, value) => {
     setCredential((prev) => ({
@@ -147,13 +191,13 @@ export default function AddProductScreen({ navigation, route }) {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 20 }}>
+    <ScrollView style={styles.container} contentContainerStyle={{ padding: 20 }}>
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#0000ff" style={styles.indicator}/>
       ) : (
         <>
           <TouchableOpacity onPress={pickImages} style={{ marginBottom: 15 }}>
-            <Text style={{ color: "blue", fontSize: 18 }}>Pick Images</Text>
+            <Text style={{ color: "blue", fontSize: 18, textAlign:"center",paddingTop:30 }}>Click to Pick Images</Text>
           </TouchableOpacity>
 
           <View
@@ -167,14 +211,14 @@ export default function AddProductScreen({ navigation, route }) {
               <TouchableOpacity
                 key={index}
                 onPress={() => removeImage(index)}
-                style={{ marginRight: 10, marginBottom: 10 }}
+                style={{ marginRight: 5, marginBottom: 10 }}
               >
                 <Image
                   source={{ uri: img.uri }}
-                  style={{ width: 100, height: 100, borderRadius: 10 }}
+                  style={{ width: 70, height: 70, borderRadius: 10 }}
                 />
                 <Text
-                  style={{ textAlign: "center", fontSize: 12, color: "red" }}
+                  style={{ textAlign: "center", fontSize: 12, color: "red",paddingTop:5 }}
                 >
                   Remove
                 </Text>
@@ -220,21 +264,28 @@ export default function AddProductScreen({ navigation, route }) {
             onChangeText={(text) => handleInputChange("description3", text)}
             style={styles.input}
           />
-
-          <Button title="Add Product" onPress={handleSubmit} disabled={loading} />
+         
+          <Button title="Add Product" onPress={handleSubmit} disabled={loading} color={"#3EB489"}/>
         </>
       )}
     </ScrollView>
   );
 }
 
-const styles = {
+const styles = StyleSheet.create({
+  container:{
+    backgroundColor:"#B9D9EB"
+  },
+  indicator:{
+    display:"flex",
+    justifyContent:"center",
+    alignItems:"center"
+  },  
   input: {
     height: 50,
-    borderColor: "gray",
-    borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 15,
+    backgroundColor:"#fff"
   },
-};
+});
