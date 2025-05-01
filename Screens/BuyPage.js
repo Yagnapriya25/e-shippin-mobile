@@ -16,7 +16,6 @@ import { getAddress } from "../Redux/Action/addressAction";
 export default function BuyPage({ navigation, route }) {
   const [loading, setLoading] = useState(true);
   const [paymentLoading, setPaymentLoading] = useState(false);
-  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
   const dispatch = useDispatch();
   const { singleProduct } = useSelector((state) => state.product);
   const { addressInfo } = useSelector((state) => state.address);
