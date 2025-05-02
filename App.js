@@ -23,6 +23,7 @@ import AddAddress from "./Screens/AddAddress";
 import EditAddress from "./Screens/EditAddress";
 import AddCategory from "./Screens/AddCategory";
 import AddProduct from "./Screens/AddProduct";
+import EditProfile from "./Screens/EditProfile";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -137,6 +138,16 @@ export default function App() {
       }}/>
 
       <Stack.Screen name="addProduct" component={AddProduct} options={{
+        headerShown:true,
+        title:"E-shippin"
+      }}/>
+
+     <Stack.Screen name="Cart" component={Cart} options={{
+        headerShown:true,
+        title:"Cart"
+      }}/>
+
+    <Stack.Screen name="EditProfile" component={EditProfile} options={{
         headerShown:true,
         title:"E-shippin"
       }}/>

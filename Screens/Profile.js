@@ -1,40 +1,50 @@
-import { View, Text, SafeAreaView, Button, ActivityIndicator } from "react-native";
-import { StyleSheet } from "react-native";
-import { Image } from "react-native";
+import { View, Text, SafeAreaView, ActivityIndicator, TouchableOpacity } from "react-native";
+import { StyleSheet, Image } from "react-native";
 import img from "../assets/Images/logo.png";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getSingleUser } from "../Redux/Action/userAction";
 
-export default function Profile() {
+export default function Profile({ navigation }) {
+  const dispatch = useDispatch();
 
-  const  [userData,setUserData]= useState();
-  const [loading,setLoading]=useState(true);
-  
-  useEffect(()=>{
-    const fetchData = async()=>{
-      try {
-        const res = await fetch(`https://e-shipin-server.onrender.com/api/user/getuser/6713954b6844b323f1c31530`,{
-          method:"GET"
-         })
-         const data = await res.json();
-         console.log(data.user.avatar);
-        setUserData(data.user)
-        setLoading(false)
-      } catch (error) {
-        
-        setLoading(true)
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-      }
-      
+  const { error, userInfo } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const id = await AsyncStorage.getItem("id");
+      if (!id) return;
+      setLoading(true);
+      await dispatch(getSingleUser(id));
+      setLoading(false);
+    };
+    fetchUserData();
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (userInfo && userInfo.user) {
+      setUserData(userInfo.user);
+      console.log(userInfo);
     }
-    fetchData()
-  },[])
+  }, [userInfo]);
 
-  if(loading){
-    return(
+  const handleLogout = async () => {
+    if (loading) return;
+    await AsyncStorage.removeItem("id");
+    await AsyncStorage.removeItem("token");
+    navigation.navigate("login");
+  };
+
+  if (loading || !userData) {
+    return (
       <View style={styles.loading}>
-      <ActivityIndicator/>
+        <ActivityIndicator size="large" color="#0000ff" />
       </View>
-    )
+    );
   }
 
   return (
@@ -44,14 +54,19 @@ export default function Profile() {
         <Text style={styles.logotext}>E-shippin</Text>
       </View>
       <View style={styles.profileContainer}>
-        <Image source={{uri:userData.avatar}} style={styles.profileImage}/>
+        <Image
+          source={userData.avatar ? { uri: userData.avatar } : img}
+          style={styles.profileImage}
+        />
         <Text style={styles.normalText1}>{userData.username}</Text>
         <Text style={styles.normalText}>{userData.email}</Text>
-        <Text style={styles.navigate}>Cart</Text>
-        <Text style={styles.navigate}>Become a seller</Text>
-        <Text style={styles.navigate}>Edit Profile</Text>
-        <Text style={styles.logout}>Logout</Text>
-     </View>
+        <Text style={styles.navigate} onPress={()=>navigation.navigate("Cart")}>Cart</Text>
+        <Text style={styles.navigate} onPress={()=>navigation.navigate("AddPost")}>Become a seller</Text>
+        <Text style={styles.navigate} onPress={()=>navigation.navigate("EditProfile")}>Edit Profile</Text>
+        <TouchableOpacity onPress={handleLogout}>
+          <Text style={styles.logout}>Logout</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -63,9 +78,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#B9D9EB",
   },
   header: {
-    display: "flex",
     flexDirection: "row",
     paddingHorizontal: 30,
+    alignItems: "center",
   },
   logo: {
     height: 30,
@@ -77,36 +92,41 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     fontWeight: "600",
   },
-  profileContainer:{
-    display:"flex",
-    alignItems:"center",
-    marginVertical:150
+  profileContainer: {
+    alignItems: "center",
+    marginVertical: 150,
   },
-  profileImage:{
-    height:150,
-    width:150,
-    borderRadius:70
+  profileImage: {
+    height: 150,
+    width: 150,
+    borderRadius: 75,
+    backgroundColor: "#ccc",
   },
-  normalText1:{
-    paddingTop:40,
-    fontSize:18,
-    fontWeight:500
+  normalText1: {
+    paddingTop: 40,
+    fontSize: 18,
+    fontWeight: "500",
   },
-  normalText:{
-    paddingTop:10,
-    fontSize:18,
-    fontWeight:500
+  normalText: {
+    paddingTop: 10,
+    fontSize: 18,
+    fontWeight: "500",
   },
-  navigate:{
-    fontSize:18,
-    paddingTop:10,
-    fontWeight:500,
-    color:"blue"
+  navigate: {
+    fontSize: 18,
+    paddingTop: 10,
+    fontWeight: "500",
+    color: "blue",
   },
-  logout:{
-    color:"red",
-    fontWeight:500,
-    fontSize:18,
-    paddingTop:20
-  }
+  logout: {
+    color: "red",
+    fontWeight: "500",
+    fontSize: 18,
+    paddingTop: 20,
+  },
+  loading: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });

@@ -235,6 +235,9 @@ export default function Cart({ navigation }) {
 
       if (verificationResponse.ok) {
         console.log("Verified Payment: ", verificationData);
+        setTimeout(()=>{
+          handleRemoveCart()
+        },2000)
       } else {
         alert("Payment verification failed!");
         console.error("Verification failed:", verificationData);

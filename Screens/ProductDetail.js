@@ -103,7 +103,8 @@ export default function ProductDetail({ navigation, route }) {
         setPopupVisible(true);
         
         setTimeout(() => {
-          setPopupVisible(false); // Close the popup after 5 seconds
+          setPopupVisible(false);
+          navigation.navigate("Cart")
         }, 2000);
       })
       .catch(() => {
