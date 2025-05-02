@@ -1,7 +1,14 @@
-import { View, Text, SafeAreaView, ActivityIndicator, TouchableOpacity } from "react-native";
-import { StyleSheet, Image } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  ActivityIndicator,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from "react-native";
 import img from "../assets/Images/logo.png";
-import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getSingleUser } from "../Redux/Action/userAction";
@@ -15,6 +22,8 @@ export default function Profile({ navigation }) {
   const { error, userInfo } = useSelector((state) => state.user);
 
   useEffect(() => {
+    let interval;
+
     const fetchUserData = async () => {
       const id = await AsyncStorage.getItem("id");
       if (!id) return;
@@ -22,13 +31,18 @@ export default function Profile({ navigation }) {
       await dispatch(getSingleUser(id));
       setLoading(false);
     };
-    fetchUserData();
+
+    fetchUserData(); // Initial fetch on mount
+
+    interval = setInterval(fetchUserData, 5000); // Re-fetch every 5 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
   }, [dispatch]);
 
   useEffect(() => {
     if (userInfo && userInfo.user) {
       setUserData(userInfo.user);
-      console.log(userInfo);
+      console.log("Fetched userInfo:", userInfo.user);
     }
   }, [userInfo]);
 
@@ -39,7 +53,7 @@ export default function Profile({ navigation }) {
     navigation.navigate("login");
   };
 
-  if (loading || !userData) {
+  if (loading && !userData) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -55,14 +69,16 @@ export default function Profile({ navigation }) {
       </View>
       <View style={styles.profileContainer}>
         <Image
-          source={userData.avatar ? { uri: userData.avatar } : img}
+          source={userData?.avatar ? { uri: userData.avatar } : img}
           style={styles.profileImage}
         />
-        <Text style={styles.normalText1}>{userData.username}</Text>
-        <Text style={styles.normalText}>{userData.email}</Text>
-        <Text style={styles.navigate} onPress={()=>navigation.navigate("Cart")}>Cart</Text>
-        <Text style={styles.navigate} onPress={()=>navigation.navigate("AddPost")}>Become a seller</Text>
-        <Text style={styles.navigate} onPress={()=>navigation.navigate("EditProfile")}>Edit Profile</Text>
+        <Text style={styles.normalText1}>{userData?.username || "N/A"}</Text>
+        <Text style={styles.normalText}>{userData?.email || "N/A"}</Text>
+
+        <Text style={styles.navigate} onPress={() => navigation.navigate("Cart")}>Cart</Text>
+        <Text style={styles.navigate} onPress={() => navigation.navigate("AddPost")}>Become a seller</Text>
+        <Text style={styles.navigate} onPress={() => navigation.navigate("EditProfile")}>Edit Profile</Text>
+
         <TouchableOpacity onPress={handleLogout}>
           <Text style={styles.logout}>Logout</Text>
         </TouchableOpacity>

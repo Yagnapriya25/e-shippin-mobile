@@ -4,8 +4,11 @@ import 'react-native-gesture-handler';
 import { createStackNavigator } from "@react-navigation/stack";
 import { StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
-import React, { useState, useEffect } from 'react';
-import { AsyncStorage } from "react-native"; // Ensure you're importing AsyncStorage correctly
+import React from 'react';
+import { Provider } from "react-redux";
+import Store from './Redux/Store/Store';
+
+// Import screens
 import Home from "./Screens/Home";
 import Category from "./Screens/Category";
 import AddPost from "./Screens/AddPost";
@@ -14,8 +17,6 @@ import Profile from "./Screens/Profile";
 import Login from "./Screens/Login";
 import Signup from "./Screens/Signup";
 import ForgetPassword from "./Screens/ForgetPassword";
-import { Provider } from "react-redux";
-import Store from './Redux/Store/Store'
 import ProductDetail from "./Screens/ProductDetail";
 import CategoryProduct from "./Screens/CategoryProduct";
 import BuyPage from "./Screens/BuyPage";
@@ -24,11 +25,12 @@ import EditAddress from "./Screens/EditAddress";
 import AddCategory from "./Screens/AddCategory";
 import AddProduct from "./Screens/AddProduct";
 import EditProfile from "./Screens/EditProfile";
+import SearchProduct from "./Screens/searchProduct";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-
+// TabNavigator for the main screen flow
 function TabNavigator() {
   return (
     <Tab.Navigator
@@ -51,10 +53,6 @@ function TabNavigator() {
           headerShown: false,
           title: "E-shippin",
           tabBarLabel: "Home",
-          headerStyle: {
-            backgroundColor: "purple",
-          },
-          headerTintColor: "white",
           tabBarIcon: () => <Ionicons name="home-outline" size={23} />,
         }}
       />
@@ -94,7 +92,6 @@ function TabNavigator() {
           tabBarIcon: () => <Ionicons name="person-outline" size={22} />,
         }}
       />
-
     </Tab.Navigator>
   );
 }
@@ -102,66 +99,68 @@ function TabNavigator() {
 export default function App() {
   return (
     <Provider store={Store}>
-     <NavigationContainer>
-     <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName="login">
-     <Stack.Screen name="login" component={Login}/>
-     <Stack.Screen name="signup" component={Signup} />
-     <Stack.Screen name="forget" component={ForgetPassword} />
-     <Stack.Screen name="Home" component={TabNavigator}/>
-     <Stack.Screen name="category-product" component={CategoryProduct} options={{
-      headerShown:true,
-      title:"Product"
-      
-     }}/>
-     <Stack.Screen name="product-detail" component={ProductDetail} options={{
-      headerShown:true,
-      title:"Product"
-      
-     }}/>
-     <Stack.Screen name="Buy" component={BuyPage} options={{
-      headerShown:true,
-      title:"E-shippin"
-      
-     }}/>
-     <Stack.Screen name="addAddress" component={AddAddress} options={{
-      headerShown:true,
-      title:"E-shippin"}}/>
-
-      <Stack.Screen name="editAddress" component={EditAddress} options={{
-        headerShown:true,
-        title:"E-shippin"
-      }}/>
-
-      <Stack.Screen name="addCategory" component={AddCategory} options={{
-        headerShown:true,
-        title:"E-shippin"
-      }}/>
-
-      <Stack.Screen name="addProduct" component={AddProduct} options={{
-        headerShown:true,
-        title:"E-shippin"
-      }}/>
-
-     <Stack.Screen name="Cart" component={Cart} options={{
-        headerShown:true,
-        title:"Cart"
-      }}/>
-
-    <Stack.Screen name="EditProfile" component={EditProfile} options={{
-        headerShown:true,
-        title:"E-shippin"
-      }}/>
-
-
-     </Stack.Navigator>
-   
-     </NavigationContainer>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="login">
+          <Stack.Screen name="login" component={Login} />
+          <Stack.Screen name="signup" component={Signup} />
+          <Stack.Screen name="forget" component={ForgetPassword} />
+          <Stack.Screen name="Home" component={TabNavigator} />
+          <Stack.Screen
+            name="category-product"
+            component={CategoryProduct}
+            options={{ headerShown: true, title: "Product" }}
+          />
+          <Stack.Screen
+            name="product-detail"
+            component={ProductDetail}
+            options={{ headerShown: true, title: "Product" }}
+          />
+          <Stack.Screen
+            name="Buy"
+            component={BuyPage}
+            options={{ headerShown: true, title: "E-shippin" }}
+          />
+          <Stack.Screen
+            name="addAddress"
+            component={AddAddress}
+            options={{ headerShown: true, title: "E-shippin" }}
+          />
+          <Stack.Screen
+            name="editAddress"
+            component={EditAddress}
+            options={{ headerShown: true, title: "E-shippin" }}
+          />
+          <Stack.Screen
+            name="addCategory"
+            component={AddCategory}
+            options={{ headerShown: true, title: "E-shippin" }}
+          />
+          <Stack.Screen
+            name="addProduct"
+            component={AddProduct}
+            options={{ headerShown: true, title: "E-shippin" }}
+          />
+          <Stack.Screen
+            name="Cart"
+            component={Cart}
+            options={{ headerShown: true, title: "Cart" }}
+          />
+          <Stack.Screen
+            name="EditProfile"
+            component={EditProfile}
+            options={{ headerShown: true, title: "E-shippin" }}
+          />
+          <Stack.Screen
+            name="searchProduct"
+            component={SearchProduct}
+            options={{ headerShown: true, title: "Products" }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
     </Provider>
-   
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-  },
+  container: {},
 });

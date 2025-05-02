@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -23,11 +23,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { categoryGetAll } from "../Redux/Action/categoryAction";
 import { getAllProduct } from "../Redux/Action/productAction";
 
-export default function Home({navigation}) {
- let [fontsLoaded] = useFonts({
+export default function Home({ navigation }) {
+  let [fontsLoaded] = useFonts({
     CrimsonPro_800ExtraBold,
   });
-
 
   const dispatch = useDispatch();
   const [offer, setOffer] = useState(data);
@@ -37,15 +36,20 @@ export default function Home({navigation}) {
 
   const offerListRef = useRef(null);
 
-  const {productInfo}  = useSelector((state) => state.product);
+  const { productInfo } = useSelector((state) => state.product);
   const product = productInfo?.products || [];
-   
+
+  const [searchText, setSearchText] = useState(''); // New state for the search input
+
+  const handleSearchTextChange = (text) => {
+    setSearchText(text); // Update the search text
+  };
 
   useFocusEffect(
     React.useCallback(() => {
       const fetchData = async () => {
-        await dispatch(categoryGetAll()).finally(()=>{
-          setLoading(false)
+        await dispatch(categoryGetAll()).finally(() => {
+          setLoading(false);
         });
       };
       fetchData();
@@ -60,7 +64,6 @@ export default function Home({navigation}) {
     };
     fetchProduct();
   }, [dispatch]);
-
 
   const autoScrollFlatList = (ref, dataLength, delay = 3000) => {
     let currentIndex = 0;
@@ -83,11 +86,10 @@ export default function Home({navigation}) {
     return stopAutoScroll; // Clean up when the component is unmounted
   }, [offer]);
 
-
   if (loading && !fontsLoaded) {
     return (
       <SafeAreaView style={styles.loadingcontainer}>
-        <ActivityIndicator size={"large"}/>
+        <ActivityIndicator size={"large"} />
       </SafeAreaView>
     );
   }
@@ -107,11 +109,22 @@ export default function Home({navigation}) {
         <Text style={styles.logotext}>E-shippin</Text>
       </View>
       <View style={styles.searchContainer}>
-        <TextInput placeholder="Search" style={styles.searchInput} />
-        <Ionicons name="search" size={20} style={styles.searchIcon} />
+        <TextInput
+          placeholder="Search"
+          style={styles.searchInput}
+          value={searchText}
+          onChangeText={handleSearchTextChange} // Update search text
+        />
+        {/* Conditionally render the search icon only when there is input */}
+        {searchText.length > 0 && (
+          <Ionicons name="search" size={20} style={styles.searchIcon} />
+        )}
       </View>
-      <ScrollView contentContainerStyle={{ paddingBottom: 20 }} showsVerticalScrollIndicator={false} 
-      showsHorizontalScrollIndicator={false} >
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 20 }}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      >
         <View style={styles.categoryContainer}>
           <Text style={styles.categoryHeader}>Category</Text>
           <FlatList
@@ -119,25 +132,32 @@ export default function Home({navigation}) {
             keyExtractor={(item) => item._id}
             horizontal
             renderItem={({ item }) => (
-              <TouchableOpacity 
-              style={styles.categoryItemContainer} 
-              onPress={()=>navigation.navigate("category-product",{cat_id:item._id})}
-            >
-              <Image source={{ uri: item.photo }} style={styles.categoryImage} resizeMode="contain"/>
-              <Text style={styles.categoryName}>{item.name}</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.categoryItemContainer}
+                onPress={() => navigation.navigate("category-product", { cat_id: item._id })}
+              >
+                <Image
+                  source={{ uri: item.photo }}
+                  style={styles.categoryImage}
+                  resizeMode="contain"
+                />
+                <Text style={styles.categoryName}>{item.name}</Text>
+              </TouchableOpacity>
             )}
           />
         </View>
         <View style={styles.offerContainer}>
           <Text style={styles.offerHeader}>Trending offers</Text>
           <FlatList
-           ref={offerListRef}
+            ref={offerListRef}
             data={offer}
             keyExtractor={(item) => item.id}
             horizontal
             renderItem={({ item }) => (
-              <TouchableOpacity style={styles.offerItemContainer} onPress={()=>navigation.navigate("category-product",{cat_id:item.id})}>
+              <TouchableOpacity
+                style={styles.offerItemContainer}
+                onPress={() => navigation.navigate("category-product", { cat_id: item.id })}
+              >
                 <Image
                   source={item.image}
                   style={styles.offerImage}
@@ -150,18 +170,21 @@ export default function Home({navigation}) {
 
         <View style={styles.productContainer}>
           <Text style={styles.productHeader}>Explore now</Text>
-          <View style={styles.productGrid} >
+          <View style={styles.productGrid}>
             {product.map((item) => (
-              <TouchableOpacity key={item._id} style={styles.productItemContainer} onPress={()=>navigation.navigate("product-detail",{p_id:item._id})}>
+              <TouchableOpacity
+                key={item._id}
+                style={styles.productItemContainer}
+                onPress={() => navigation.navigate("product-detail", { p_id: item._id })}
+              >
                 <Image
                   source={{
-                    uri: item.images && item.images.length > 0 ? item.images[0].image : 'https://path/to/default/image.png'
+                    uri: item.images && item.images.length > 0 ? item.images[0].image : 'https://path/to/default/image.png',
                   }}
                   style={styles.productImage}
                 />
                 <Text style={styles.productName}>{item.name}</Text>
                 <Text style={styles.productPrice}>₹{item.price}</Text>
-                
               </TouchableOpacity>
             ))}
           </View>
@@ -172,12 +195,12 @@ export default function Home({navigation}) {
 }
 
 const styles = StyleSheet.create({
-  loadingcontainer:{
-    display:"flex",
-    justifyContent:"center",
-    alignItems:"center",
-    flex:1,
-    backgroundColor:"#B9D9EB"
+  loadingcontainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1,
+    backgroundColor: "#B9D9EB",
   },
   container: {
     flex: 1,
@@ -199,7 +222,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     fontWeight: "600",
     fontFamily: "CrimsonPro_800ExtraBold",
-
   },
   searchContainer: {
     display: "flex",
@@ -243,7 +265,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textAlign: "center",
     fontFamily: "CrimsonPro_800ExtraBold",
-
   },
   offerContainer: {
     paddingTop: 20,
@@ -277,31 +298,30 @@ const styles = StyleSheet.create({
     fontFamily: "CrimsonPro_800ExtraBold",
   },
   productGrid: {
-    flexDirection: 'row',  // Items in a row
-    flexWrap: 'wrap',      // Allow wrapping to the next line
-    justifyContent: 'space-between',  // Add space between items
+    flexDirection: "row", // Items in a row
+    flexWrap: "wrap", // Allow wrapping to the next line
+    justifyContent: "space-between", // Add space between items
   },
   productItemContainer: {
-    width: '32%',          // 2 items per row
-    marginBottom: 10,      // Add space between items
-    alignItems: 'center',
-    backgroundColor:"#fff",
-    padding:10,
-    borderRadius:8,
+    width: "32%", // 2 items per row
+    marginBottom: 10, // Add space between items
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 8,
   },
   productImage: {
     width: 80,
     height: 80,
-    backgroundColor:"#F5F5DC",
+    backgroundColor: "#F5F5DC",
     borderRadius: 10,
   },
   productName: {
     fontSize: 12,
     textAlign: "center",
     marginTop: 10,
-
   },
-  productPrice:{
-    fontWeight:600
-  }
+  productPrice: {
+    fontWeight: 600,
+  },
 });
