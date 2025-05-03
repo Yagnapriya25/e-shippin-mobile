@@ -37,12 +37,14 @@ export default function Home({ navigation }) {
   const offerListRef = useRef(null);
 
   const { productInfo } = useSelector((state) => state.product);
-  const product = productInfo?.products || [];
+  const product = productInfo?.products
+    ? [...productInfo.products].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    : [];
 
-  const [searchText, setSearchText] = useState(''); // New state for the search input
+  const [searchText, setSearchText] = useState('');
 
   const handleSearchTextChange = (text) => {
-    setSearchText(text); // Update the search text
+    setSearchText(text);
   };
 
   useFocusEffect(
@@ -73,17 +75,21 @@ export default function Home({ navigation }) {
           animated: true,
           index: currentIndex,
         });
-        currentIndex = (currentIndex + 1) % dataLength; // Loop back to the first item after reaching the end
+        currentIndex = (currentIndex + 1) % dataLength;
       }
     }, delay);
 
-    return () => clearInterval(interval); // Cleanup the interval when component unmounts
+    return () => clearInterval(interval);
   };
 
-  // Start auto-scrolling for offers after component mount
+  const handleSearch = async () => {
+    navigation.navigate("searchProduct", { query: searchText });
+    setSearchText("");
+  };
+
   useEffect(() => {
     const stopAutoScroll = autoScrollFlatList(offerListRef, offer.length);
-    return stopAutoScroll; // Clean up when the component is unmounted
+    return stopAutoScroll;
   }, [offer]);
 
   if (loading && !fontsLoaded) {
@@ -109,20 +115,18 @@ export default function Home({ navigation }) {
         <Text style={styles.logotext}>E-shippin</Text>
       </View>
       <View style={styles.searchContainer}>
-  <TextInput
-    placeholder="Search"
-    style={styles.searchInput}
-    value={searchText}
-    onChangeText={handleSearchTextChange}
-  />
-  {searchText.length > 0 && (
-    <TouchableOpacity
-      onPress={() => navigation.navigate("searchProduct", { query: searchText })}
-    >
-      <Ionicons name="search" size={20} style={styles.searchIcon} />
-    </TouchableOpacity>
-  )}
-</View>
+        <TextInput
+          placeholder="Search"
+          style={styles.searchInput}
+          value={searchText}
+          onChangeText={handleSearchTextChange}
+        />
+        {searchText.length > 0 && (
+          <TouchableOpacity onPress={handleSearch}>
+            <Ionicons name="search" size={20} style={styles.searchIcon} />
+          </TouchableOpacity>
+        )}
+      </View>
       <ScrollView
         contentContainerStyle={{ paddingBottom: 20 }}
         showsVerticalScrollIndicator={false}
@@ -301,13 +305,13 @@ const styles = StyleSheet.create({
     fontFamily: "CrimsonPro_800ExtraBold",
   },
   productGrid: {
-    flexDirection: "row", // Items in a row
-    flexWrap: "wrap", // Allow wrapping to the next line
-    justifyContent: "space-between", // Add space between items
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   productItemContainer: {
-    width: "32%", // 2 items per row
-    marginBottom: 10, // Add space between items
+    width: "32%",
+    marginBottom: 10,
     alignItems: "center",
     backgroundColor: "#fff",
     padding: 10,
@@ -325,6 +329,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   productPrice: {
-    fontWeight: 600,
+    fontWeight: "600",
   },
 });

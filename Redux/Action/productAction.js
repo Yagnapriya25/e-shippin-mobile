@@ -59,6 +59,7 @@ const getAllProduct = () => async (dispatch) => {
         });
 
         const data = await res.json();
+        console.log(data);
         if (res.ok) {
             dispatch(productGetAllSuccess(data));
         } else {
@@ -168,7 +169,7 @@ const searchProduct = (query) => async (dispatch) => {
     try {
         dispatch(searchProductRequest());
 
-        const res = await fetch(`${process.env.REACT_APP_URL}/product/search/${query}`, {
+        const res = await fetch(`https://e-shipin-server.onrender.com/api/product/search/${query}`, {
             method: "GET"
         });
 

@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, StyleSheet, Image, TextInput, ScrollView, ActivityIndicator, Pressable, RefreshControl } from 'react-native';
+import { View, Text, SafeAreaView, StyleSheet, Image, TextInput, ScrollView, ActivityIndicator, Pressable, RefreshControl, TouchableOpacity } from 'react-native';
 import img from "../assets/Images/logo.png";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState, useCallback } from 'react';
@@ -11,6 +11,8 @@ export default function Category({ navigation }) {
     const { categoryInfo, error, loading: categoryLoading } = useSelector((state) => state.category || {});
     const categories = categoryInfo?.categories || [];
     const [refreshing, setRefreshing] = useState(false);
+
+      const [searchText, setSearchText] = useState(''); 
 
     // Fetch categories whenever screen comes into focus
     useFocusEffect(
@@ -34,6 +36,15 @@ export default function Category({ navigation }) {
         );
     }
 
+    const handleSearchTextChange = (text) => {
+        setSearchText(text); // Update the search text
+      };
+
+    const handleSearch = async()=>{
+        navigation.navigate("searchProduct", { query: searchText })
+        setSearchText("")
+      }
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
@@ -41,9 +52,20 @@ export default function Category({ navigation }) {
                 <Text style={styles.logotext}>E-shippin</Text>
             </View>
 
-            <View style={styles.searchContainer}>
-                <TextInput placeholder="Search" style={styles.searchInput} />
-                <Ionicons name="search" size={20} style={styles.searchIcon} />
+               <View style={styles.searchContainer}>
+              <TextInput
+                placeholder="Search"
+                style={styles.searchInput}
+                value={searchText}
+                onChangeText={handleSearchTextChange}
+              />
+              {searchText.length > 0 && (
+                <TouchableOpacity
+                  onPress={() => handleSearch()}
+                >
+                  <Ionicons name="search" size={20} style={styles.searchIcon} />
+                </TouchableOpacity>
+              )}
             </View>
 
             <ScrollView
