@@ -109,17 +109,20 @@ export default function Home({ navigation }) {
         <Text style={styles.logotext}>E-shippin</Text>
       </View>
       <View style={styles.searchContainer}>
-        <TextInput
-          placeholder="Search"
-          style={styles.searchInput}
-          value={searchText}
-          onChangeText={handleSearchTextChange} // Update search text
-        />
-        {/* Conditionally render the search icon only when there is input */}
-        {searchText.length > 0 && (
-          <Ionicons name="search" size={20} style={styles.searchIcon} />
-        )}
-      </View>
+  <TextInput
+    placeholder="Search"
+    style={styles.searchInput}
+    value={searchText}
+    onChangeText={handleSearchTextChange}
+  />
+  {searchText.length > 0 && (
+    <TouchableOpacity
+      onPress={() => navigation.navigate("searchProduct", { query: searchText })}
+    >
+      <Ionicons name="search" size={20} style={styles.searchIcon} />
+    </TouchableOpacity>
+  )}
+</View>
       <ScrollView
         contentContainerStyle={{ paddingBottom: 20 }}
         showsVerticalScrollIndicator={false}

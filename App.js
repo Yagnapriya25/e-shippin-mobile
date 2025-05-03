@@ -25,7 +25,7 @@ import EditAddress from "./Screens/EditAddress";
 import AddCategory from "./Screens/AddCategory";
 import AddProduct from "./Screens/AddProduct";
 import EditProfile from "./Screens/EditProfile";
-import SearchProduct from "./Screens/searchProduct";
+import SearchProduct from "./Screens/SearchProduct";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
