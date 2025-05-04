@@ -16,7 +16,6 @@ const login = (credentials)=>async(dispatch)=>{
         }
       })
       const data = await res.json();
-      console.log(data);
       dispatch(loginSuccess(data));
       if(data.user && data.user._id && data.token){
        await AsyncStorage.setItem("id",data.user._id);
@@ -160,7 +159,6 @@ const getSingleUser = (userData)=>async(dispatch)=>{
             }
         })
         const data = await res.json();
-        console.log(data);
         if(res.ok){
             dispatch(getUserSuccess(data))
         }

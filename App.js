@@ -164,6 +164,12 @@ export default function App() {
             options={{ headerShown: true, title: "Products" }}
           />
 
+          <Stack.Screen
+            name="addPost"
+            component={AddPost}
+            options={{ headerShown: true, title: "Choose Category" }}
+          />
+
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

@@ -42,7 +42,6 @@ export default function Profile({ navigation }) {
   useEffect(() => {
     if (userInfo && userInfo.user) {
       setUserData(userInfo.user);
-      console.log("Fetched userInfo:", userInfo.user);
     }
   }, [userInfo]);
 

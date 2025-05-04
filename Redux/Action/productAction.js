@@ -101,7 +101,7 @@ const deleteProduct = (productInfo) => async (dispatch) => {
         dispatch(productDeleteRequest());
         const { id } = productInfo;
 
-        const res = await fetch(`${process.env.REACT_APP_URL}/product/remove/${id}`, {
+        const res = await fetch(`https://e-shipin-server.onrender.com/api/product/remove/${id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json"
@@ -145,7 +145,7 @@ const getSingleUserProduct = (userInfo) => async (dispatch) => {
     try {
         dispatch(getSingleUserProductRequest());
 
-        const res = await fetch(`${process.env.REACT_APP_URL}/product/getproduct/${userInfo}`, {
+        const res = await fetch(`https://e-shipin-server.onrender.com/api/product/getproduct/${userInfo}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
