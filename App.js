@@ -26,6 +26,7 @@ import AddCategory from "./Screens/AddCategory";
 import AddProduct from "./Screens/AddProduct";
 import EditProfile from "./Screens/EditProfile";
 import SearchProduct from "./Screens/SearchProduct";
+import BecomeSeller from "./Screens/BecomeSeller";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -155,6 +156,14 @@ export default function App() {
             component={SearchProduct}
             options={{ headerShown: true, title: "Products" }}
           />
+
+
+          <Stack.Screen
+            name="userSell"
+            component={BecomeSeller}
+            options={{ headerShown: true, title: "Products" }}
+          />
+
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

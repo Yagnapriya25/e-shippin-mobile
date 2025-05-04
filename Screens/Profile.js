@@ -76,7 +76,7 @@ export default function Profile({ navigation }) {
         <Text style={styles.normalText}>{userData?.email || "N/A"}</Text>
 
         <Text style={styles.navigate} onPress={() => navigation.navigate("Cart")}>Cart</Text>
-        <Text style={styles.navigate} onPress={() => navigation.navigate("AddPost")}>Become a seller</Text>
+        <Text style={styles.navigate} onPress={() => navigation.navigate("userSell")}>Become a seller</Text>
         <Text style={styles.navigate} onPress={() => navigation.navigate("EditProfile")}>Edit Profile</Text>
 
         <TouchableOpacity onPress={handleLogout}>

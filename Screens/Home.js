@@ -237,10 +237,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   searchInput: {
-    width: 280,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    paddingLeft: 10,
+        flex: 1,
+        backgroundColor: "#fff",
+        borderRadius: 10,
+        paddingLeft: 10,
+        height: 40,
   },
   searchIcon: {
     padding: 5,
