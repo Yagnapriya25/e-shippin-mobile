@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   SafeAreaView,
   Text,
@@ -15,10 +15,10 @@ import { clearError } from "../Redux/Slice/userSlice";
 export default function ForgetPassword({ navigation }) {
   const [credential, setCredential] = useState({ email: "" });
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState("");
   const dispatch = useDispatch();
 
-  const { error, userInfo } = useSelector((state) => state.user);
+  // Accessing the error and otpSent states from Redux store
+  const { error, otpSent } = useSelector((state) => state.user);
 
   const handleChange = (e, field) => {
     setCredential({
@@ -30,32 +30,18 @@ export default function ForgetPassword({ navigation }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
-  
+
     setLoading(true);
-    setSuccess("");
-    dispatch(clearError());
-  
-    const action = await dispatch(forgetPassword({ email: credential.email }));
-    
-    if (action.type.endsWith("Success")) {
-      setSuccess("Please check your mail (including spam folder).");
-    } else {
-      setSuccess(""); // fallback (error will display from Redux)
-    }
-  
+    dispatch(clearError()); // Clear previous error messages
+
+    // Trigger the forget password action
+    await dispatch(forgetPassword({ email: credential.email }));
+
     setLoading(false);
+    console.log("error"+error);
+    console.log("Success"+otpSent)
   };
-  
 
-  useEffect(() => {
-    if (!error && credential.email) {
-      setSuccess("Please check your mail (including spam folder).");
-    } else {
-      setSuccess(""); // Reset if there's an error
-    }
-  }, [error]);
-
-  
   const handleNavigateToLogin = () => {
     dispatch(clearError());
     navigation.navigate("login");
@@ -65,6 +51,7 @@ export default function ForgetPassword({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.formbox}>
         <Text style={styles.formHead}>E-shippin</Text>
+
         <TextInput
           placeholder="Email"
           style={styles.email}
@@ -72,15 +59,23 @@ export default function ForgetPassword({ navigation }) {
           value={credential.email}
           onChangeText={(text) => handleChange(text, "email")}
         />
+
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Reset</Text>
         </TouchableOpacity>
 
+        {loading && (
+          <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} />
+        )}
+
+        {/* Display success or error message based on Redux state */}
         {error ? (
           <Text style={styles.error}>{error}</Text>
-        ) : (
-          success && <Text style={styles.success}>{success}</Text>
-        )}
+        ) : otpSent ? (
+          <Text style={styles.success}>
+            Password reset link has been sent to your email. Please check your inbox.
+          </Text>
+        ) : null}
 
         <Text style={styles.footerText} onPress={handleNavigateToLogin}>
           Login
@@ -89,7 +84,6 @@ export default function ForgetPassword({ navigation }) {
     </SafeAreaView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -104,7 +98,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   formbox: {
-    height: 330,
+    height: 380,
     backgroundColor: "#fff",
     width: 300,
     borderRadius: 15,
@@ -115,7 +109,7 @@ const styles = StyleSheet.create({
     paddingTop: 25,
     paddingBottom: 50,
     fontSize: 30,
-    fontFamily: "CrimsonPro_800ExtraBold", // Apply Crimson Pro Bold font
+    fontFamily: "CrimsonPro_800ExtraBold",
   },
   email: {
     height: 40,
@@ -129,7 +123,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 20,
     marginBottom: 10,
-    color: "#007BFF", // Blue color for links
+    color: "#007BFF",
   },
   button: {
     paddingTop: 11,
@@ -149,11 +143,4 @@ const styles = StyleSheet.create({
     color: "green",
     marginTop: 10,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
 });
-
-

@@ -112,68 +112,72 @@ const verifyOtp = (credentials) => async (dispatch) => {
 };
 
 
-// const forgetPassword = (credentials)=>async(dispatch)=>{
-//   try {
-//     dispatch(forgetPasswordRequest());
-//     const res = await fetch(`https://e-shipin-server.onrender.com/api/user/forget`,{
-//         method:"POST",
-//         body:JSON.stringify(credentials),
-//         headers:{
-//             "Content-Type":"application/json"
-//         }
-
-//     })
-//     const data = await res.json();
-//     console.log(data);
-//     if(res.ok){
-//         dispatch(forgetPasswordSuccess(data))
-//     }
-//     else{
-//         dispatch(forgetPasswordFail(data.message))
-//     }
-//   } catch (error) {
-//     dispatch(forgetPasswordFail(error.message || "Network Error"))
-//   }
-// }
-
-const forgetPassword = (credentials) => async (dispatch) => {
-    try {
-      dispatch(forgetPasswordRequest());
-  
-      const res = await fetch(`https://e-shipin-server.onrender.com/api/user/forget`, {
-        method: "POST",
-        body: JSON.stringify(credentials),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-  
-      const text = await res.text(); // get the raw response
-  
-      if (!res.ok) {
-        let errorMessage = "An unknown error occurred";
-  
-        try {
-          if (text && text.trim().startsWith("{")) {
-            const parsed = JSON.parse(text);
-            errorMessage = parsed.message || errorMessage;
-          } else {
-            errorMessage = text || errorMessage;
-          }
-        } catch (err) {
-          console.error("Failed to parse error JSON:", err);
+const forgetPassword = (credentials)=>async(dispatch)=>{
+  try {
+    dispatch(forgetPasswordRequest());
+    const res = await fetch(`https://e-shipin-server.onrender.com/api/user/forget`,{
+        method:"POST",
+        body:JSON.stringify(credentials),
+        headers:{
+            "Content-Type":"application/json"
         }
-  
-        dispatch(forgetPasswordFail(errorMessage));
-      } else {
-        const data = text ? JSON.parse(text) : {}; // parse success data
-        dispatch(forgetPasswordSuccess(data));
-      }
-    } catch (error) {
-      console.error("Network or other error:", error);
-      dispatch(forgetPasswordFail(error.message || "Network Error"));
+
+    })
+    const data = await res.json();
+    console.log(data.message);
+    if(res.ok){
+        dispatch(forgetPasswordSuccess(data.message))
     }
-  };
+    else{
+        dispatch(forgetPasswordFail(data.message))
+    }
+  } catch (error) {
+    dispatch(forgetPasswordFail(error.message || "Network Error"))
+  }
+}
+
+// const forgetPassword = (credentials) => async (dispatch) => {
+//     try {
+//       dispatch(forgetPasswordRequest());
+  
+//       const res = await fetch(`https://e-shipin-server.onrender.com/api/user/forget`, {
+//         method: "POST",
+//         body: JSON.stringify(credentials),
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//       });
+  
+//       const text = await res.text(); // get the raw response text
+  
+//       if (!res.ok) {
+//         let errorMessage = "An unknown error occurred";
+  
+//         try {
+//           if (text && text.trim().startsWith("{")) {
+//             const parsed = JSON.parse(text);
+//             errorMessage = parsed.message || errorMessage;
+//           } else {
+//             errorMessage = text || errorMessage;
+//           }
+//         } catch (err) {
+//           console.error("Failed to parse error JSON:", err);
+//         }
+  
+//         dispatch(forgetPasswordFail(errorMessage));
+//       } else {
+//         // Parse successful JSON with message and link
+//         const data = text ? JSON.parse(text) : {};
+//         const { message, link } = data;
+  
+//         dispatch(forgetPasswordSuccess({ message, link }));
+//       }
+//     } catch (error) {
+//       console.error("Network or other error:", error);
+//       dispatch(forgetPasswordFail(error.message || "Network Error"));
+//     }
+//   };
+  
   
   
 
