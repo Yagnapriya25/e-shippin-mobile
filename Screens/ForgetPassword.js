@@ -1,92 +1,65 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Button,
   SafeAreaView,
   Text,
   TextInput,
   View,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator,
+  StyleSheet,
 } from "react-native";
-import { StyleSheet } from "react-native";
-import {
-  useFonts,
-  CrimsonPro_200ExtraLight,
-  CrimsonPro_300Light,
-  CrimsonPro_400Regular,
-  CrimsonPro_500Medium,
-  CrimsonPro_600SemiBold,
-  CrimsonPro_700Bold,
-  CrimsonPro_800ExtraBold,
-  CrimsonPro_900Black,
-  CrimsonPro_200ExtraLight_Italic,
-  CrimsonPro_300Light_Italic,
-  CrimsonPro_400Regular_Italic,
-  CrimsonPro_500Medium_Italic,
-  CrimsonPro_600SemiBold_Italic,
-  CrimsonPro_700Bold_Italic,
-  CrimsonPro_800ExtraBold_Italic,
-  CrimsonPro_900Black_Italic,
-} from "@expo-google-fonts/crimson-pro";
-import { useNavigation } from "@react-navigation/native";
-import { ActivityIndicator } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { forgetPassword } from "../Redux/Action/userAction";
+import { clearError } from "../Redux/Slice/userSlice";
 
 export default function ForgetPassword({ navigation }) {
-  const [credential, setCredential] = useState({
-    email: "",
-  });
-  const [success, setSuccess] = useState("");
+  const [credential, setCredential] = useState({ email: "" });
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
   const dispatch = useDispatch();
+
   const { error, userInfo } = useSelector((state) => state.user);
 
   const handleChange = (e, field) => {
     setCredential({
       ...credential,
-      [field]: e,
+      [field]: e.toLowerCase(),
     });
   };
 
-  let [fontsLoaded] = useFonts({
-    CrimsonPro_200ExtraLight,
-    CrimsonPro_300Light,
-    CrimsonPro_400Regular,
-    CrimsonPro_500Medium,
-    CrimsonPro_600SemiBold,
-    CrimsonPro_700Bold,
-    CrimsonPro_800ExtraBold,
-    CrimsonPro_900Black,
-    CrimsonPro_200ExtraLight_Italic,
-    CrimsonPro_300Light_Italic,
-    CrimsonPro_400Regular_Italic,
-    CrimsonPro_500Medium_Italic,
-    CrimsonPro_600SemiBold_Italic,
-    CrimsonPro_700Bold_Italic,
-    CrimsonPro_800ExtraBold_Italic,
-    CrimsonPro_900Black_Italic,
-  });
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
+  
     setLoading(true);
-    dispatch(forgetPassword({ email: credential.email })).finally(() => {
-      setLoading(false);
-      setSuccess("Email sent successfully");
-      // Clear success message after 5 seconds (optional)
-      setTimeout(() => setSuccess(""), 5000);
-    });
+    setSuccess("");
+    dispatch(clearError());
+  
+    const action = await dispatch(forgetPassword({ email: credential.email }));
+    
+    if (action.type.endsWith("Success")) {
+      setSuccess("Please check your mail (including spam folder).");
+    } else {
+      setSuccess(""); // fallback (error will display from Redux)
+    }
+  
+    setLoading(false);
   };
+  
 
-  // If fonts are not loaded, show loading state
-  if (!fontsLoaded) {
-    return (
-      <View>
-        <ActivityIndicator size={"large"} />
-      </View>
-    );
-  }
+  useEffect(() => {
+    if (!error && credential.email) {
+      setSuccess("Please check your mail (including spam folder).");
+    } else {
+      setSuccess(""); // Reset if there's an error
+    }
+  }, [error]);
+
+  
+  const handleNavigateToLogin = () => {
+    dispatch(clearError());
+    navigation.navigate("login");
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -102,14 +75,21 @@ export default function ForgetPassword({ navigation }) {
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Reset</Text>
         </TouchableOpacity>
-        {success ? <Text style={styles.success}>{success}</Text> : null}
-        <Text style={styles.footerText} onPress={() => navigation.navigate("login")}>
+
+        {error ? (
+          <Text style={styles.error}>{error}</Text>
+        ) : (
+          success && <Text style={styles.success}>{success}</Text>
+        )}
+
+        <Text style={styles.footerText} onPress={handleNavigateToLogin}>
           Login
         </Text>
       </View>
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -121,9 +101,10 @@ const styles = StyleSheet.create({
   error: {
     textAlign: "center",
     color: "red",
+    marginTop: 10,
   },
   formbox: {
-    height: 300,
+    height: 330,
     backgroundColor: "#fff",
     width: 300,
     borderRadius: 15,
@@ -168,4 +149,11 @@ const styles = StyleSheet.create({
     color: "green",
     marginTop: 10,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
+
+

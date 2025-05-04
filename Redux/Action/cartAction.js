@@ -50,28 +50,6 @@ const decreaseCart = (userInfo,productInfo)=>async(dispatch)=>{
   
     }
 }
-// const increaseCart = (userInfo,productInfo)=>async(dispatch)=>{
-//     try {
-//         dispatch(cartIncreaseRequest());
-//         const res = await fetch(`${URL}/cart/increase/${userInfo}/${productInfo}`,{
-//             method:"PUT",
-//             headers:{
-//                 "Content-Type":"application/json"
-//             }
-//         })
-//         const data = await res.json();
-//         console.log(data);
-//         if(res.ok){
-//             dispatch(cartIncreaseSuccess(data));
-//         }
-//         else{
-//             dispatch(cartIncreaseFail(data.message))
-//         }
-//     } catch (error) {
-//         dispatch(cartIncreaseFail(error.message))
-  
-//     }
-// }
 const increaseCart = (userInfo, productInfo) => async (dispatch) => {
     try {
         dispatch(cartIncreaseRequest());
@@ -124,12 +102,8 @@ const getCart = (userInfo)=>async(dispatch)=>{
         dispatch(getAllCartRequest());
         const res = await fetch(`https://e-shipin-server.onrender.com/api/cart/get/${userInfo}`,{
             method:"GET",
-            // headers:{
-            //     "Content-Type":"application/json"
-            // }
         })
         const data = await res.json();
-        console.log(data);
         if(res.ok){
             dispatch(getAllCartSuccess(data))
         }

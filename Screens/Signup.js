@@ -5,18 +5,15 @@ import {
   SafeAreaView,
   TextInput,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import { StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { signup, verifyOtp } from "../Redux/Action/userAction";
+import { clearError, resetOtpSent } from "../Redux/Slice/userSlice";
 
 export default function Signup({ navigation }) {
   const dispatch = useDispatch();
-  const [otpSent, setOtpSent] = useState(false); // Flag to check if OTP is sent
   const [credentials, setCredentials] = useState({
     username: "",
     email: "",
@@ -25,45 +22,66 @@ export default function Signup({ navigation }) {
   const [otp, setOtp] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const { error, otpSent } = useSelector((state) => state.user);
+  const [showOtpUI, setShowOtpUI] = useState(false); // Local state to mirror otpSent
+
+  useEffect(() => {
+    setErrorMessage(error || "");
+  }, [error]);
+
+  useEffect(() => {
+    if (otpSent) {
+      setShowOtpUI(true);
+    }
+  }, [otpSent]);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleChange = (e, field) => {
+  const handleChange = (value, field) => {
     setCredentials({
       ...credentials,
-      [field]: e,
+      [field]: value,
     });
   };
 
-  const handleSignup = (e) => {
-    e.preventDefault();
-    if (loading) return; // Prevent multiple submissions when loading
-    setLoading(true); // Set loading state to true when the signup starts
-    dispatch(signup(credentials)).finally(() => {
-      setLoading(false); // Set loading back to false after the dispatch
-      setOtpSent(true); // OTP sent, now change the UI
-    });
-  };
-
-  const handleOtpSubmit = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
-    dispatch(verifyOtp({ otp, email: credentials.email }))
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((err) => {
-        console.error("OTP verification failed", err);
-      })
-      .finally(() => {
-        setLoading(false);
-        setTimeout(() => {
-          navigation.navigate("login");
-        }, 1000);
-      });
+    setErrorMessage("");
+
+    await dispatch(signup(credentials));
+    setLoading(false);
+  };
+
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault();
+    if (loading) return;
+    setLoading(true);
+    setErrorMessage("");
+
+    try {
+      await dispatch(verifyOtp({ otp, email: credentials.email }));
+      dispatch(resetOtpSent());
+      setTimeout(() => {
+        navigation.navigate("login");
+      }, 1000);
+    } catch (err) {
+      setErrorMessage("OTP verification failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNavigateToLogin = () => {
+    dispatch(clearError());
+    setErrorMessage("");
+    dispatch(resetOtpSent());
+    navigation.navigate("login");
   };
 
   return (
@@ -71,8 +89,7 @@ export default function Signup({ navigation }) {
       <View style={styles.formbox}>
         <Text style={styles.formHead}>E-shippin</Text>
 
-        {/* Before OTP is sent, show Username, Email, and Password */}
-        {!otpSent && (
+        {!showOtpUI ? (
           <>
             <TextInput
               placeholder="Username"
@@ -84,7 +101,7 @@ export default function Signup({ navigation }) {
               placeholder="Email"
               style={styles.input}
               value={credentials.email}
-              onChangeText={(text) => handleChange(text, "email")}
+              onChangeText={(text) => handleChange(text.toLowerCase(), "email")}
               keyboardType="email-address"
             />
             <View style={styles.passwordContainer}>
@@ -116,18 +133,14 @@ export default function Signup({ navigation }) {
               </Text>
             </TouchableOpacity>
           </>
-        )}
-
-        {/* After OTP is sent, only show Email and OTP */}
-        {otpSent && (
+        ) : (
           <>
             <TextInput
               placeholder="Email"
               style={styles.input}
               value={credentials.email}
-              onChangeText={(text) => handleChange(text, "email")}
+              editable={false}
               keyboardType="email-address"
-              editable={false} // Email field should be read-only after OTP is sent
             />
             <TextInput
               placeholder="Enter OTP"
@@ -135,7 +148,6 @@ export default function Signup({ navigation }) {
               keyboardType="numeric"
               value={otp}
               onChangeText={(text) => setOtp(text)}
-              required
             />
             <TouchableOpacity
               style={styles.button}
@@ -151,13 +163,14 @@ export default function Signup({ navigation }) {
 
         <View style={styles.footerContainer}>
           <Text style={styles.footerText1}>Already Have An Account?</Text>
-          <Text
-            style={styles.footerText2}
-            onPress={() => navigation.navigate("login")}
-          >
+          <Text style={styles.footerText2} onPress={handleNavigateToLogin}>
             Login
           </Text>
         </View>
+
+        {errorMessage !== "" && (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -171,7 +184,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   formbox: {
-    height: 450,
+    height: 460,
     backgroundColor: "#fff",
     width: 300,
     borderRadius: 15,
@@ -217,17 +230,18 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   footerContainer: {
-    display: "flex",
     flexDirection: "row",
     justifyContent: "center",
     paddingTop: 20,
   },
   footerText2: {
     color: "#007BFF",
+    marginLeft: 5,
   },
   errorText: {
     color: "red",
+    fontSize: 10,
     textAlign: "center",
-    marginTop: 10,
+    marginVertical: 10,
   },
 });

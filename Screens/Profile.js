@@ -48,8 +48,12 @@ export default function Profile({ navigation }) {
   const handleLogout = async () => {
     if (loading) return;
     await AsyncStorage.removeItem("id");
-    await AsyncStorage.removeItem("token");
-    navigation.navigate("login");
+    await AsyncStorage.removeItem("userToken");
+    await AsyncStorage.removeItem("loginTime");
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "login" }],
+    });
   };
 
   if (loading && !userData) {

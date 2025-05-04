@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
   Text,
@@ -13,19 +13,19 @@ import {
   useFonts,
   CrimsonPro_800ExtraBold,
 } from "@expo-google-fonts/crimson-pro";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "../Redux/Action/userAction";
 import { loginRequest } from "../Redux/Slice/userSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function Login({navigation}) {
+export default function Login({ navigation }) {
   let [fontsLoaded] = useFonts({
     CrimsonPro_800ExtraBold,
   });
 
-const moveTo = (screen,payload)=>{
-  navigation.navigate(screen,{...payload})
-}
+  const moveTo = (screen, payload) => {
+    navigation.navigate(screen, { ...payload });
+  };
 
   const [showPassword, setShowPassword] = useState(false);
   const [credentials, setCredentials] = useState({
@@ -33,14 +33,43 @@ const moveTo = (screen,payload)=>{
     password: ''
   });
 
+  const { error } = useSelector((state) => state.user);
+  const [errorMessage, setErrorMessage] = useState('');
   const dispatch = useDispatch();
 
-  // Function to toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  // If fonts are not loaded, show loading state
+  // Auto login check
+  useEffect(() => {
+    const checkAutoLogin = async () => {
+      const token = await AsyncStorage.getItem('userToken');
+      const loginTime = await AsyncStorage.getItem('loginTime');
+
+      if (token && loginTime) {
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+
+        if (now - parseInt(loginTime) < oneDay) {
+          moveTo("Home");
+        } else {
+          await AsyncStorage.removeItem('userToken');
+          await AsyncStorage.removeItem('id');
+          await AsyncStorage.removeItem('loginTime');
+        }
+      }
+    };
+
+    checkAutoLogin();
+  }, []);
+
+  useEffect(() => {
+    if (error) {
+      setErrorMessage(error);
+    }
+  }, [error]);
+
   if (!fontsLoaded) {
     return (
       <View style={styles.loading}>
@@ -51,24 +80,30 @@ const moveTo = (screen,payload)=>{
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
     try {
       dispatch(loginRequest());
       const result = await dispatch(login(credentials));
 
       if (result && result.user && result.token) {
-         await AsyncStorage.setItem('userToken', result.token);
-         await AsyncStorage.setItem('id',result.user._id);
-         const id = await AsyncStorage.getItem("id");
-         const token = await AsyncStorage.getItem("userToken");
-        if(token&&id){
-         moveTo("Home")
+        await AsyncStorage.setItem('userToken', result.token);
+        await AsyncStorage.setItem('id', result.user._id);
+        await AsyncStorage.setItem('loginTime', Date.now().toString());
+
+        const id = await AsyncStorage.getItem("id");
+        const token = await AsyncStorage.getItem("userToken");
+
+        if (token && id) {
+          moveTo("Home");
+        } else {
+          setErrorMessage("Login failed. Please check your credentials.");
         }
-        else{
-          moveTo("login")
-        }
+      } else {
+        setErrorMessage("Invalid login credentials.");
       }
     } catch (err) {
       console.error("Login failed:", err);
+      setErrorMessage("Something went wrong. Try again.");
     }
   };
 
@@ -80,21 +115,29 @@ const moveTo = (screen,payload)=>{
           placeholder="Email"
           style={styles.email}
           value={credentials.email}
-          onChangeText={(text) => setCredentials({ ...credentials, email: text })}
+          onChangeText={(text) => {
+            setCredentials({
+              ...credentials,
+              email: text.toLowerCase(), // Automatically convert to lowercase
+            });
+            setErrorMessage('');
+          }}
         />
 
-        {/* Password Input with Toggle Visibility */}
         <View style={styles.passwordContainer}>
           <TextInput
             placeholder="Password"
             secureTextEntry={!showPassword}
             style={styles.input}
             value={credentials.password}
-            onChangeText={(text) => setCredentials({ ...credentials, password: text })}
+            onChangeText={(text) => {
+              setCredentials({ ...credentials, password: text });
+              setErrorMessage('');
+            }}
           />
           <TouchableOpacity onPress={togglePasswordVisibility} style={styles.iconContainer}>
             <Ionicons
-              name={showPassword ? "eye-off-outline" : "eye-outline"} // Toggle icon based on state
+              name={showPassword ? "eye-off-outline" : "eye-outline"}
               size={24}
               color="#000"
             />
@@ -105,7 +148,7 @@ const moveTo = (screen,payload)=>{
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
 
-        <Text style={styles.footerText} onPress={()=>navigation.navigate("forget")}>Forget Password?</Text>
+        <Text style={styles.footerText} onPress={() => navigation.navigate("forget")}>Forget Password?</Text>
 
         <View style={styles.footerContainer}>
           <Text style={styles.footerText1}>Don't Have An Account?</Text>
@@ -113,6 +156,8 @@ const moveTo = (screen,payload)=>{
             SignUp
           </Text>
         </View>
+
+        {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
       </View>
     </SafeAreaView>
   );
@@ -147,7 +192,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginTop: 12,
     borderRadius: 5,
-    width:280
+    width: 280
   },
   email: {
     height: 40,
@@ -160,7 +205,7 @@ const styles = StyleSheet.create({
   footerText: {
     textAlign: "center",
     marginTop: 20,
-    color: "#007BFF", // Blue color for links
+    color: "#007BFF",
   },
   passwordContainer: {
     flexDirection: "row",
@@ -192,5 +237,10 @@ const styles = StyleSheet.create({
   },
   footerText2: {
     color: "#007BFF",
+  },
+  error: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 10,
   },
 });

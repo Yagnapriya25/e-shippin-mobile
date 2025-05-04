@@ -6,7 +6,7 @@ const initialState = {
     error: null,
     otpSent: false,
     passwordResetSuccess: false,
-    isAuthenticated:false
+    isAuthenticated: false
 };
 
 const userSlice = createSlice({
@@ -25,6 +25,11 @@ const userSlice = createSlice({
         loginFail(state, action) {
             state.loading = false;
             state.error = action.payload;
+        },
+
+        // Clear error
+        clearError(state) {
+            state.error = null;
         },
 
         // Signup
@@ -83,6 +88,12 @@ const userSlice = createSlice({
         // Logout
         logout(state) {
             state.userInfo = null;
+            state.isAuthenticated = false;
+        },
+
+        // Reset OTP Sent
+        resetOtpSent(state) {
+            state.otpSent = false;
         },
 
         // Delete User
@@ -97,36 +108,42 @@ const userSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
         },
-        getAllUserRequest(state){
-            state.loading=true;
+
+        // Get All Users
+        getAllUserRequest(state) {
+            state.loading = true;
         },
-        getAllUserSuccess(state,action){
+        getAllUserSuccess(state, action) {
             state.loading = false;
             state.userInfo = action.payload;
         },
-        getAllUserFail(state,action){
+        getAllUserFail(state, action) {
             state.loading = false;
             state.error = action.payload;
         },
-        getUserRequest(state){
-            state.loading=true;
+
+        // Get User
+        getUserRequest(state) {
+            state.loading = true;
         },
-        getUserSuccess(state,action){
+        getUserSuccess(state, action) {
             state.loading = false;
             state.userInfo = action.payload;
         },
-        getUserFail(state,action){
+        getUserFail(state, action) {
             state.loading = false;
             state.error = action.payload;
         },
-        editUserRequest(state){
-            state.loading = true
+
+        // Edit User
+        editUserRequest(state) {
+            state.loading = true;
         },
-        editUserSuccess(state,action){
+        editUserSuccess(state, action) {
             state.loading = false;
             state.userInfo = action.payload;
         },
-        editUserFail(state,action){
+        editUserFail(state, action) {
             state.loading = false;
             state.error = action.payload;
         }
@@ -161,7 +178,9 @@ export const {
     getAllUserSuccess,
     editUserRequest,
     editUserSuccess,
-    editUserFail
+    editUserFail,
+    clearError,
+    resetOtpSent // Updated name
 } = userSlice.actions;
 
 export default userSlice.reducer;

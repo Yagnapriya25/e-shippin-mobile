@@ -1,4 +1,4 @@
-import { editUserFail, editUserRequest, editUserSuccess, forgetPasswordFail, forgetPasswordRequest, forgetPasswordSuccess, getAllUserFail, getAllUserRequest, getAllUserSuccess, getUserRequest, getUserSuccess, loginFail, loginRequest, loginSuccess, otpFail, otpRequest, otpSuccess, resetFail, resetRequest, resetSuccess, signupFail, signupRequest, signupSuccess } from "../Slice/userSlice"
+import { editUserFail, editUserRequest, editUserSuccess, forgetPasswordFail, forgetPasswordRequest, forgetPasswordSuccess, getAllUserFail, getAllUserRequest, getAllUserSuccess, getUserRequest, getUserSuccess, loginFail, loginRequest, loginSuccess, otpFail, otpRequest, otpSuccess, resetFail, resetRequest, resetSuccess, signupFail, signupRequest, signupSuccess,setOtpSent } from "../Slice/userSlice"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
@@ -28,29 +28,63 @@ const login = (credentials)=>async(dispatch)=>{
 }
 
 
+// const signup = (credentials) => async (dispatch) => {
+//     try {
+//         dispatch(signupRequest());
+//         const { email, password, username } = credentials;
+//         const res = await fetch(`https://e-shipin-server.onrender.com/api/user/register`, {
+//           method: "POST",
+//           body: JSON.stringify(credentials),
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//         });
+//         const data = await res.json();
+//         console.log(data);
+//         if (res.ok) {
+//           dispatch(signupSuccess(data));
+//         } else {
+//           dispatch(signupFail(data.message));
+//         }
+//       } catch (error) {
+//         dispatch(signupFail(error.message));
+//       }
+// };
+
 const signup = (credentials) => async (dispatch) => {
     try {
         dispatch(signupRequest());
-        const { email, password, username } = credentials;
-        const res = await fetch(`https://e-shipin-server.onrender.com/api/user/register`, {
-          method: "POST",
-          body: JSON.stringify(credentials),
-          headers: {
-            "Content-Type": "application/json",
-          },
+        const res = await fetch("https://e-shipin-server.onrender.com/api/user/register", {
+            method: "POST",
+            body: JSON.stringify(credentials),
+            headers: {
+                "Content-Type": "application/json",
+            },
         });
+
         const data = await res.json();
-        console.log(data);
+        console.log(data);  // Log the response for error structure
+
         if (res.ok) {
-          dispatch(signupSuccess(data));
+            // Dispatch success action with the received data
+            dispatch(signupSuccess(data));
+
+            // Check if OTP was sent and dispatch to update otpSent state
+            if (data.msg && data.msg === "OTP sent to email") {
+                dispatch(otpSuccess());  // Dispatch the action to set otpSent to true
+            }
         } else {
-          dispatch(signupFail(data.message));
+            // Handle error if the response is not OK
+            const errorMessage = data.msg || data.message || "An error occurred";
+            dispatch(signupFail(errorMessage));
         }
-      } catch (error) {
-        dispatch(signupFail(error.message));
-      }
+    } catch (error) {
+        // Handle network or other errors
+        dispatch(signupFail(error.message || "Something went wrong"));
+    }
 };
 
+  
 const verifyOtp = (credentials) => async (dispatch) => {
     try {
         dispatch(otpRequest());
@@ -78,29 +112,73 @@ const verifyOtp = (credentials) => async (dispatch) => {
 };
 
 
-const forgetPassword = (credentials)=>async(dispatch)=>{
-  try {
-    dispatch(forgetPasswordRequest());
-    const res = await fetch(`https://e-shipin-server.onrender.com/api/user/forget`,{
-        method:"POST",
-        body:JSON.stringify(credentials),
-        headers:{
-            "Content-Type":"application/json"
-        }
+// const forgetPassword = (credentials)=>async(dispatch)=>{
+//   try {
+//     dispatch(forgetPasswordRequest());
+//     const res = await fetch(`https://e-shipin-server.onrender.com/api/user/forget`,{
+//         method:"POST",
+//         body:JSON.stringify(credentials),
+//         headers:{
+//             "Content-Type":"application/json"
+//         }
 
-    })
-    const data = await res.json();
-    console.log(data);
-    if(res.ok){
-        dispatch(forgetPasswordSuccess(data))
+//     })
+//     const data = await res.json();
+//     console.log(data);
+//     if(res.ok){
+//         dispatch(forgetPasswordSuccess(data))
+//     }
+//     else{
+//         dispatch(forgetPasswordFail(data.message))
+//     }
+//   } catch (error) {
+//     dispatch(forgetPasswordFail(error.message || "Network Error"))
+//   }
+// }
+
+const forgetPassword = (credentials) => async (dispatch) => {
+    try {
+      dispatch(forgetPasswordRequest());
+  
+      const res = await fetch(`https://e-shipin-server.onrender.com/api/user/forget`, {
+        method: "POST",
+        body: JSON.stringify(credentials),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      const text = await res.text(); // get the raw response
+  
+      if (!res.ok) {
+        let errorMessage = "An unknown error occurred";
+  
+        try {
+          if (text && text.trim().startsWith("{")) {
+            const parsed = JSON.parse(text);
+            errorMessage = parsed.message || errorMessage;
+          } else {
+            errorMessage = text || errorMessage;
+          }
+        } catch (err) {
+          console.error("Failed to parse error JSON:", err);
+        }
+  
+        dispatch(forgetPasswordFail(errorMessage));
+      } else {
+        const data = text ? JSON.parse(text) : {}; // parse success data
+        dispatch(forgetPasswordSuccess(data));
+      }
+    } catch (error) {
+      console.error("Network or other error:", error);
+      dispatch(forgetPasswordFail(error.message || "Network Error"));
     }
-    else{
-        dispatch(forgetPasswordFail(data.message))
-    }
-  } catch (error) {
-    dispatch(forgetPasswordFail(error.message || "Network Error"))
-  }
-}
+  };
+  
+  
+
+
+  
 
 
 const resetPassword = (credentials,userData)=>async(dispatch)=>{
